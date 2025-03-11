@@ -5,7 +5,6 @@ const test = (req, res) => {
     res.json("Hello from auth controller");
 };
 
-const hashPassword = await hashPassword(password)
 
 
 const registerUser = async (req, res) => {
