@@ -1,5 +1,5 @@
 const user = require('../models/user');
-const { hashPassword, comparePassword, hashPassword } = require('../helpers/auth')
+const { hashPassword, comparePassword } = require('../helpers/auth')
 
 const test = (req, res) => {
     res.json("Hello from auth controller");
