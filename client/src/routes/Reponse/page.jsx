@@ -131,8 +131,8 @@ const StudentSubmitResponsePage = () => {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
-                  : "border-gray-300 dark:border-gray-700"
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
+                : "border-gray-300 dark:border-gray-700"
                 }`}
             >
               {file ? (
@@ -182,8 +182,8 @@ const StudentSubmitResponsePage = () => {
           {message && (
             <div
               className={`flex items-center gap-x-2 p-2 rounded-lg ${message.includes("succès")
-                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
-                  : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
+                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
+                : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
                 }`}
             >
               {message.includes("succès") ? (
