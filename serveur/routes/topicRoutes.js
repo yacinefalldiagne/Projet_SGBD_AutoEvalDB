@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
+const { createTopic } = require("../controllers/topicController");
 
 // middleware
 router.use(
@@ -10,6 +11,6 @@ router.use(
     })
 );
 
-router.post("",)
+router.post("/createTopic", createTopic)
 
 module.exports = router
