@@ -7,7 +7,7 @@ const userSchema = new Schema({
         type: String,
         trim: true,
         required: true,
-        unique: 32,
+        unique: true,
     },
     password: {
         type: String,
@@ -17,4 +17,4 @@ const userSchema = new Schema({
 
 const userModel = mongoose.model('User', userSchema);
 
-module.export = userModel
+module.exports = userModel

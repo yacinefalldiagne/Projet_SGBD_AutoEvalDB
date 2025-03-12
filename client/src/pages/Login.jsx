@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import pattern from "../assets/images/pattern.png";
 import github from "../assets/images/github.svg";
 import { ArrowLeft } from 'lucide-react';
 import { useState } from "react";
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export function Login() {
+
+    const navigate = useNavigate();
 
     const [data, setData] = useState({
         email: '',
@@ -14,13 +17,28 @@ export function Login() {
 
     const loginUser = async (e) => {
         e.preventDefault();
-        axios.get('');
-    }
+        const { email, password } = data;
+        try {
+            console.log("Sending login request with:", { email, password });
+
+            const { data } = await axios.post("http://localhost:8000/login", { email, password }, { withCredentials: true });
+            toast.success(data.message)
+            if (data.error) {
+                toast.error(data.error);
+            } else {
+                setData({});
+                navigate('/dashboard');
+            }
+        } catch (error) {
+            console.error("Login failed:", error);
+            toast.error("Email et/ou mot de passe incorrect.");
+        }
+    };
 
     return (
         <section className="m-8 flex gap-4">
             <div className="w-full lg:w-3/5 mt-24">
-                <Link to="/home" className="absolute top-4 left-4 text-2xl text-grey-500">
+                <Link to="/" className="absolute top-4 left-4 text-2xl text-grey-500">
                     <ArrowLeft />
                 </Link>
                 <div className="text-center">
@@ -49,18 +67,6 @@ export function Login() {
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
                         />
-                    </div>
-                    <div className="flex items-center">
-                        <input type="checkbox" id="terms" className="-ml-2.5" />
-                        <label htmlFor="terms" className="flex items-center font-medium text-gray-700">
-                            J'accepte&nbsp;
-                            <a
-                                href="#"
-                                className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                            >
-                                les conditions d'utilisation
-                            </a>
-                        </label>
                     </div>
                     <button className="mt-6 w-full bg-sky-800 text-white p-2 rounded-lg">
                         Se connecter

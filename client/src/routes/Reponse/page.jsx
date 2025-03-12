@@ -76,7 +76,7 @@ const StudentSubmitResponsePage = () => {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:5000/api/submissions", {
+      const response = await fetch("http://localhost:8000/api/submissions", {
         method: "POST",
         body: formData,
       });
@@ -130,11 +130,10 @@ const StudentSubmitResponsePage = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                isDragging
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
                   : "border-gray-300 dark:border-gray-700"
-              }`}
+                }`}
             >
               {file ? (
                 <p className="text-gray-700 dark:text-gray-300">
@@ -166,9 +165,8 @@ const StudentSubmitResponsePage = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`btn bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-x-2 ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`btn bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-x-2 ${loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             {loading ? (
               "Envoi en cours..."
@@ -183,11 +181,10 @@ const StudentSubmitResponsePage = () => {
           {/* Message de feedback */}
           {message && (
             <div
-              className={`flex items-center gap-x-2 p-2 rounded-lg ${
-                message.includes("succès")
+              className={`flex items-center gap-x-2 p-2 rounded-lg ${message.includes("succès")
                   ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
                   : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
-              }`}
+                }`}
             >
               {message.includes("succès") ? (
                 <CheckCircle size={18} />

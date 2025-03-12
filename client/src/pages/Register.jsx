@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useState } from "react";
 
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export default function Register() {
 
@@ -21,13 +22,14 @@ export default function Register() {
         const { name, email, password } = data
         try {
 
-            const { data } = await axios.post('/register', { name, email, password });
-            if (data.error) {
+            const { data } = await axios.post("http://localhost:8000/register", { name, email, password }, { withCredentials: true });
 
+            if (data.error) {
+                toast.error(data.message);
             }
             else {
                 setData({});
-                navigate('/login');
+                navigate('/dashboard');
             }
         } catch (error) {
             console.log(error);
@@ -43,7 +45,7 @@ export default function Register() {
                     className="h-full w-full object-cover rounded-3xl"
                     alt="Pattern"
                 />
-                <Link to="/home" className="absolute top-4 left-4 text-2xl text-white">
+                <Link to="/" className="absolute top-4 left-4 text-2xl text-white">
                     <ArrowLeft />
                 </Link>
             </div>

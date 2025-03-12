@@ -6,7 +6,7 @@ function Navbar() {
     const LINKS = [
         {
             name: "Accueil",
-            link: "/home",
+            link: "/",
         },
         {
             name: "Manuel",

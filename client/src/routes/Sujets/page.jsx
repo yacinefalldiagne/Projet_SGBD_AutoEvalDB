@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BookOpen, Calendar, Download, FileText, Search } from "lucide-react";
 import { Footer } from "@/layouts/footer";
 import { useTheme } from "@/hooks/use-theme";
+import { useDropzone } from "react-dropzone";
 
 const StudentAssignmentsPage = () => {
+
   const { theme } = useTheme();
   const [assignments, setAssignments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,6 +63,8 @@ const StudentAssignmentsPage = () => {
           </div>
         </div>
       </div>
+
+
 
       {/* Gestion des états de chargement et d'erreur */}
       {loading ? (

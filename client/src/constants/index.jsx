@@ -1,4 +1,4 @@
-import {/* ChartColumn*/ Home, /*NotepadText, Package, PackagePlus, */ Settings, /*ShoppingBag,*/ SpellCheck,FileText, Send,LogOut } from "lucide-react";
+import {/* ChartColumn*/ Home, /*NotepadText, Package, PackagePlus, */ Settings, /*ShoppingBag,*/ SpellCheck, FileText, Send, LogOut } from "lucide-react";
 
 import ProfileImage from "@/assets/profile-image.jpg";
 import ProductImage from "@/assets/product-image.jpg";
@@ -10,7 +10,7 @@ export const navbarLinks = [
             {
                 label: "Dashboard",
                 icon: Home,
-                path: "/",
+                path: "/dashboard",
             },
             // {
             //     label: "Sujets",
@@ -30,19 +30,19 @@ export const navbarLinks = [
             {
                 label: "Sujets",
                 icon: FileText,
-                path: "/Sujets",
+                path: "/dashboard/sujets",
             },
             {
                 label: "Soumettre reponse",
                 icon: Send,
-                path: "/Soumettre reponse",
+                path: "/dashboard/soumettre",
             },
             {
                 label: "Consulter correction",
                 icon: SpellCheck,
-                path: "/Consulter correction",
+                path: "/dashboard/correction",
             },
-            
+
         ],
     },
     // {
@@ -71,16 +71,16 @@ export const navbarLinks = [
             {
                 label: "Settings",
                 icon: Settings,
-                path: "/settings",
+                path: "/dashboard/settings",
             },
             {
                 label: "Deconnexion",
                 icon: LogOut,
-                path: "/Deconnexion",
+                path: "/dashboard/logout",
             },
         ],
     },
-    
+
 ];
 
 export const overviewData = [
