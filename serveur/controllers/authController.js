@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await hashPassword(password);
 
-        const newUser = new User({ name, email, password: hashedPassword });
+        const newUser = new User({ name, email, password: hashedPassword, role: "etudiant" });
         await newUser.save();
 
         res.status(201).json({ message: "Utilisateur crée avec succès !" });
@@ -57,7 +57,7 @@ const loginUser = async (req, res) => {
         }
 
         // Créez le token JWT et définissez-le dans un cookie
-        jwt.sign({ email: user.email, id: user._id, name: user.name }, process.env.JWT_SECRET, {}, (err, token) => {
+        jwt.sign({ email: user.email, id: user._id, name: user.name, role: user.role }, process.env.JWT_SECRET, {}, (err, token) => {
             if (err) {
                 return res.status(400).json({ error: 'Error creating token' });
             }
@@ -73,22 +73,30 @@ const loginUser = async (req, res) => {
 };
 
 
-const getProfile = (req, res) => {
-    const { token } = req.cookies;  // Récupérer le token depuis les cookies
+const getProfile = async (req, res) => {
+    const { token } = req.cookies; // Récupérer le token depuis les cookies
 
     if (!token) {
         return res.status(401).json({ error: 'Token non fourni, veuillez vous connecter' });
     }
 
-    // Vérification du token
-    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
-        if (err) {
-            return res.status(403).json({ error: 'Token invalide ou expiré' });
+    try {
+        // Vérifier le token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+
+        // Récupérer les données complètes de l'utilisateur depuis la base de données
+        const user = await User.findById(userId).select('-password'); // Exclure le mot de passe
+        if (!user) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        // Si le token est valide, renvoyer les informations de l'utilisateur
-        return res.status(200).json({ user: decodedUser });
-    });
+        // Renvoyer les informations de l'utilisateur
+        return res.status(200).json({ user });
+    } catch (err) {
+        console.error("Erreur dans getProfile:", err);
+        return res.status(403).json({ error: 'Token invalide ou expiré' });
+    }
 };
 
 

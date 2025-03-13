@@ -1,87 +1,80 @@
-import {/* ChartColumn*/ Home, /*NotepadText, Package, PackagePlus, */ Settings, /*ShoppingBag,*/ SpellCheck, FileText, Send, LogOut } from "lucide-react";
+import { CloudCog, BookOpen, ChartColumn, NotepadText, Edit, Home, Settings, SpellCheck, FileText, Send, LogOut } from "lucide-react";
+
 
 import ProfileImage from "@/assets/profile-image.jpg";
 import ProductImage from "@/assets/product-image.jpg";
 
-export const navbarLinks = [
+export const navbarLinksEtudiant = [
     {
         title: "Dashboard",
-        links: [
-            {
-                label: "Dashboard",
-                icon: Home,
-                path: "/dashboard",
-            },
-            // {
-            //     label: "Sujets",
-            //     icon: ChartColumn,
-            //     path: "/analytics",
-            // },
-            // {
-            //     label: "Soumettre reponse ",
-            //     icon: NotepadText,
-            //     path: "/reports",
-            // },
-        ],
+        links: [{ label: "Dashboard", icon: Home, path: "/etudiant" }],
     },
     {
         title: "Sujets",
         links: [
-            {
-                label: "Sujets",
-                icon: FileText,
-                path: "/dashboard/sujets",
-            },
-            {
-                label: "Soumettre reponse",
-                icon: Send,
-                path: "/dashboard/soumettre",
-            },
-            {
-                label: "Consulter correction",
-                icon: SpellCheck,
-                path: "/dashboard/correction",
-            },
-
+            { label: "Sujets", icon: FileText, path: "/etudiant/sujets" },
+            { label: "Soumettre réponse", icon: Send, path: "/etudiant/soumettre" },
+            { label: "Consulter correction", icon: SpellCheck, path: "/etudiant/correction" },
         ],
     },
-    // {
-    //     title: "Products",
-    //     links: [
-    //         {
-    //             label: "Products",
-    //             icon: Package,
-    //             path: "/products",
-    //         },
-    //         {
-    //             label: "New product",
-    //             icon: PackagePlus,
-    //             path: "/new-product",
-    //         },
-    //         {
-    //             label: "Inventory",
-    //             icon: ShoppingBag,
-    //             path: "/inventory",
-    //         },
-    //     ],
-    // },
     {
         title: "Settings",
         links: [
+            { label: "Paramètres", icon: Settings, path: "/etudiant/settings" },
+            { label: "Déconnexion", icon: LogOut, path: "/logout" },
+        ],
+    },
+];
+
+export const navbarLinksProf = [
+    {
+        title: "Dashboard",
+        links: [
             {
-                label: "Settings",
-                icon: Settings,
-                path: "/dashboard/settings",
+                label: "Statistiques",
+                icon: ChartColumn,
+                path: "/enseignant/statistique",
             },
             {
-                label: "Deconnexion",
-                icon: LogOut,
-                path: "/dashboard/logout",
+                label: "Dépôt de Sujet",
+                icon: NotepadText,
+                path: "/enseignant/exercices",
+            },
+            {
+                label: "Correction",
+                icon: Edit,
+                path: "/enseignant/correction",
             },
         ],
     },
-
+    {
+        title: "Intelligent",
+        links: [
+            {
+                label: "Correction",
+                icon: CloudCog,
+                path: "/enseignant/intelligent/correctionAutomatique",
+            },
+            {
+                label: "Apprentissage",
+                icon: BookOpen,
+                path: "/enseignant/intelligent/apprentissage",
+            },
+        ],
+    },
+    {
+        title: "Paramètres",
+        links: [
+            {
+                label: "Paramètres",
+                icon: Settings,
+                path: "/enseignant/settings",
+            },
+            { label: "Déconnexion", icon: LogOut, path: "/logout" },
+        ],
+    },
 ];
+
 
 export const overviewData = [
     {

@@ -19,7 +19,6 @@
 
     .sidebar-item {
         @apply flex h-[40px] w-full flex-shrink-0 items-center gap-x-3 rounded-lg p-3 text-base font-medium text-slate-900 transition-colors hover:bg-blue-50 dark:text-slate-50 dark:hover:bg-blue-950;
-
         &.active {
             @apply bg-blue-500 text-slate-50 dark:bg-blue-600;
         }
@@ -79,7 +78,7 @@
 }
 
 .recharts-default-tooltip {
-    @apply !rounded-lg !border !border-slate-300 !bg-white transition-colors;
+    @apply !rounded-lg !border !border-slate-300 !bg-white transition-colors dark:!border-slate-700 dark:!bg-slate-900;
 }
 
 .recharts-tooltip-label {
@@ -87,5 +86,5 @@
 }
 
 .recharts-tooltip-item {
-    @apply text-base font-medium !text-blue-500 dark:text-blue-600;
+    @apply text-base font-medium !text-blue-500 dark:!text-blue-600;
 }

@@ -1,6 +1,6 @@
 import { useTheme } from "@/hooks/use-theme";
 
-import { Bell, ChevronsLeft, Moon, Search, Sun } from "lucide-react";
+import { Bell, ChevronsLeft, Moon, Search, Sun, LogOut } from "lucide-react";
 
 import profileImg from "@/assets/profile-image.jpg";
 
@@ -46,16 +46,12 @@ export const Header = ({ collapsed, setCollapsed }) => {
                         className="hidden dark:block"
                     />
                 </button>
-                {/* <button className="btn-ghost size-10">
+                <button className="btn-ghost size-10">
                     <Bell size={20} />
                 </button>
-                <button className="size-10 overflow-hidden rounded-full">
-                    <img
-                        src={profileImg}
-                        alt="profile image"
-                        className="size-full object-cover"
-                    />
-                </button> */}
+                <a href="/logout" className="btn-ghost size-10">
+                    <LogOut size={20} />
+                </a>
             </div>
         </header>
     );
