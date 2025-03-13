@@ -3,6 +3,7 @@ const dotenv = require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const path = require('path');
 
 const app = express();
 
@@ -32,6 +33,10 @@ app.use(cookieParser());
 // Routes
 app.use("/", require("./routes/authRoutes"));
 app.use("/", require("./routes/submissionRoutes"));
+app.use("/", require("./routes/topicRoutes"));
+
+// Dossier des fichiers statiques
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Lancement du serveur
 app.listen(port, () => {

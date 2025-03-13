@@ -2,44 +2,79 @@ import { useState, useEffect, useCallback } from "react";
 import { BookOpen, Calendar, Download, FileText, Search } from "lucide-react";
 import { Footer } from "@/layouts/footer";
 import { useTheme } from "@/hooks/use-theme";
-import { useDropzone } from "react-dropzone";
+import axios from "axios";
 
 const StudentAssignmentsPage = () => {
-
   const { theme } = useTheme();
   const [assignments, setAssignments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // URL de base du serveur
+  const BASE_URL = "http://localhost:8000";
+
   // Fonction pour récupérer les sujets depuis l'API
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
     try {
-      const response = await fetch("/api/assignments"); // Remplacez par votre URL d'API réelle
-      if (!response.ok) throw new Error("Erreur lors du chargement des sujets");
-      const data = await response.json();
-      setAssignments(data);
+      const response = await axios.get(`${BASE_URL}/getTopic`);
+      setAssignments(response.data);
       setLoading(false);
     } catch (err) {
-      setError(err.message);
+      setError(err.response ? err.response.data.message : "Erreur lors du chargement des sujets");
       setLoading(false);
     }
-  };
+  }, []);
 
   // Charger les sujets au montage et toutes les 10 secondes
   useEffect(() => {
-    fetchAssignments(); // Chargement initial
-    const interval = setInterval(fetchAssignments, 10000); // Polling toutes les 10 secondes
-    return () => clearInterval(interval); // Nettoyage
-  }, []);
+    fetchAssignments();
+    const interval = setInterval(fetchAssignments, 10000);
+    return () => clearInterval(interval);
+  }, [fetchAssignments]);
 
   // Filtrer les sujets en fonction de la recherche
   const filteredAssignments = assignments.filter(
     (assignment) =>
-      assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.teacher.toLowerCase().includes(searchTerm.toLowerCase())
+      assignment.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assignment.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (assignment.teacher?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        assignment.teacher?.email?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Fonction pour télécharger un fichier
+  const downloadFile = (assignment) => {
+    // Vérifier si l'assignment a un fichier
+    if (!assignment.file) {
+      alert("Aucun fichier disponible pour ce sujet.");
+      return;
+    }
+
+    // Construire l'URL complète du fichier
+    let fileUrl;
+
+    // Si le chemin commence déjà par /uploads, utiliser tel quel
+    if (assignment.file.startsWith('/uploads/')) {
+      fileUrl = `${BASE_URL}${assignment.file}`;
+    }
+    // Si le chemin est juste le nom du fichier
+    else {
+      fileUrl = `${BASE_URL}/uploads/${assignment.file}`;
+    }
+
+    // Créer un lien temporaire pour le téléchargement
+    const link = document.createElement('a');
+    link.href = fileUrl;
+
+    // Extraire le nom du fichier du chemin
+    const fileName = assignment.file.split('/').pop() || `sujet_${assignment.title}.pdf`;
+    link.setAttribute('download', fileName);
+
+    // Ajouter le lien au DOM, cliquer dessus, puis le supprimer
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="flex flex-col gap-y-4 min-h-screen">
@@ -64,8 +99,6 @@ const StudentAssignmentsPage = () => {
         </div>
       </div>
 
-
-
       {/* Gestion des états de chargement et d'erreur */}
       {loading ? (
         <div className="card col-span-full">
@@ -84,7 +117,7 @@ const StudentAssignmentsPage = () => {
           {filteredAssignments.length > 0 ? (
             filteredAssignments.map((assignment) => (
               <div
-                key={assignment.id}
+                key={assignment?._id || assignment?.id}
                 className="card hover:shadow-lg transition-shadow duration-200"
               >
                 <div className="card-header">
@@ -100,25 +133,33 @@ const StudentAssignmentsPage = () => {
                   <div className="flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-2 text-sm">
                       <FileText size={16} className="text-blue-500 dark:text-blue-600" />
-                      <span>Par: {assignment.teacher}</span>
+                      <span>Par: {assignment.teacher?.name || "Inconnu"}</span>
                     </div>
                     <div className="flex items-center gap-x-2 text-sm">
                       <Calendar size={16} className="text-blue-500 dark:text-blue-600" />
-                      <span>Date: {assignment.date}</span>
+                      <span>Date: {new Date(assignment.date).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center gap-x-2 text-sm">
-                      <Calendar size={16} className="text-red-500" />
-                      <span>Échéance: {assignment.deadline}</span>
-                    </div>
+                    {assignment.deadline && (
+                      <div className="flex items-center gap-x-2 text-sm">
+                        <Calendar size={16} className="text-red-500" />
+                        <span>Échéance: {new Date(assignment.deadline).toLocaleDateString()}</span>
+                      </div>
+                    )}
                   </div>
-                  <a
-                    href={assignment.fileUrl}
-                    download
-                    className="mt-4 inline-flex items-center gap-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Download size={18} />
-                    Télécharger le sujet
-                  </a>
+
+                  {assignment.file ? (
+                    <button
+                      onClick={() => downloadFile(assignment)}
+                      className="mt-4 inline-flex items-center gap-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <Download size={18} />
+                      Télécharger le sujet
+                    </button>
+                  ) : (
+                    <div className="mt-4 text-gray-500 italic">
+                      Aucun fichier disponible
+                    </div>
+                  )}
                 </div>
               </div>
             ))

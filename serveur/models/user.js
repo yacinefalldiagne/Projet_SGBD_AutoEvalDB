@@ -12,7 +12,8 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
-    }
+    },
+    role: String,
 }, { timestamps: true });
 
 const userModel = mongoose.model('User', userSchema);

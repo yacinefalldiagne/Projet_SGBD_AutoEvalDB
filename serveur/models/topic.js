@@ -9,7 +9,7 @@ const topicSchema = new Schema({
     },
     description: String,
     teacher: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'User',
         required: true
     },
@@ -18,10 +18,10 @@ const topicSchema = new Schema({
         default: Date.now
     },
     deadline: Date,
-    fileUrl: {
-        data: Buffer,
-        contentType: String
+    file: {
+        type: String,
     },
+    correction: String,
 }, { timestamps: true });
 
 const topicModel = mongoose.model('Topic', topicSchema);
