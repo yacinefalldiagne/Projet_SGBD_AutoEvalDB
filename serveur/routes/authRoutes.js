@@ -1,11 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-<<<<<<< HEAD
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { test, registerUser, loginUser, getProfile, logoutUser } = require("../controllers/authController");
-=======
 const {
     test,
     registerUser,
@@ -14,7 +12,6 @@ const {
     logoutUser,
 } = require("../controllers/authController");
 const { verifyToken, checkRole } = require("../middlewares/authMiddleware");
->>>>>>> 473cca35c3deb7070ad423671532d3416beff9b4
 
 // Middleware CORS
 router.use(
@@ -24,14 +21,12 @@ router.use(
     })
 );
 
-<<<<<<< HEAD
 // Routes classiques
 router.get("/", test);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", getProfile);
 router.post("/logout", logoutUser);
-=======
 // Routes publiques
 router.get("/", test);
 router.post("/register", registerUser);
@@ -50,7 +45,6 @@ router.get("/enseignant", verifyToken, checkRole(["enseignant"]), (req, res) => 
 router.get("/etudiant", verifyToken, checkRole(["etudiant"]), (req, res) => {
     res.json({ message: "Bienvenue, étudiant !" });
 });
->>>>>>> 473cca35c3deb7070ad423671532d3416beff9b4
 
 // Routes OAuth Google
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
