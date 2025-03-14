@@ -7,7 +7,6 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 export function Login() {
-
     const navigate = useNavigate();
 
     const [data, setData] = useState({
@@ -33,6 +32,19 @@ export function Login() {
             console.error("Login failed:", error);
             toast.error("Email et/ou mot de passe incorrect.");
         }
+    };
+
+    // Fonctions pour gérer l'authentification OAuth
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:8000/auth/google";
+    };
+
+    const handleGithubLogin = () => {
+        window.location.href = "http://localhost:8000/auth/github";
+    };
+
+    const handleMicrosoftLogin = () => {
+        window.location.href = "http://localhost:8000/auth/microsoft";
     };
 
     return (
@@ -84,7 +96,11 @@ export function Login() {
                         </a>
                     </div>
                     <div className="space-y-4 mt-8">
-                        <button className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg">
+                        <button 
+                            type="button" 
+                            onClick={handleGoogleLogin}
+                            className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
                             <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g clipPath="url(#clip0_1156_824)">
                                     <path d="M16.3442 8.18429C16.3442 7.64047 16.3001 7.09371 16.206 6.55872H8.66016V9.63937H12.9813C12.802 10.6329 12.2258 11.5119 11.3822 12.0704V14.0693H13.9602C15.4741 12.6759 16.3442 10.6182 16.3442 8.18429Z" fill="#4285F4" />
@@ -100,9 +116,26 @@ export function Login() {
                             </svg>
                             <span>Se connecter avec Google</span>
                         </button>
-                        <button className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg">
+                        <button 
+                            type="button"
+                            onClick={handleGithubLogin}
+                            className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
                             <img src={github} height={24} width={24} alt="GitHub Logo" />
                             <span>Se connecter avec GitHub</span>
+                        </button>
+                        <button 
+                            type="button"
+                            onClick={handleMicrosoftLogin}
+                            className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                            <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
+                                <path d="M20 1H11V10H20V1Z" fill="#7FBA00"/>
+                                <path d="M10 11H1V20H10V11Z" fill="#00A4EF"/>
+                                <path d="M20 11H11V20H20V11Z" fill="#FFB900"/>
+                            </svg>
+                            <span>Se connecter avec Microsoft</span>
                         </button>
                     </div>
                     <p className="text-center text-blue-gray-500 font-medium mt-4">
