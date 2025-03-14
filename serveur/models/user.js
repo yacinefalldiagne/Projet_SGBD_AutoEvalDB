@@ -11,11 +11,24 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
+        // Rendre le password optionnel pour les connexions OAuth
+        required: function() {
+            return !this.googleId && !this.githubId && !this.microsoftId;
+        }
     },
+    googleId: String,
+    githubId: String,
+    microsoftId: String,
+    role: {
+        type: String,
+        enum: ['student', 'teacher'],
+        default: 'student'
+    },
+    profilePicture: String,
+    
     role: String,
 }, { timestamps: true });
 
 const userModel = mongoose.model('User', userSchema);
 
-module.exports = userModel
+module.exports = userModel;
