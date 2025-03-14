@@ -15,7 +15,7 @@ function App() {
       path: "/",
       element: <Layout />, // Le Navbar doit être à l'intérieur de Layout
       children: [
-        { index: true, element: <Home /> },
+        { index: true, element: <DashboardPage /> },
         { path: "home", element: <Home /> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
@@ -23,13 +23,8 @@ function App() {
         { path: "Sujets", element: <StudentAssignmentsPage /> },
         { path: "Soumettre reponse", element: <StudentSubmitResponsePage /> },
         { path: "Consulter correction", element: <StudentViewCorrectionsPage /> },
-        { path: "analytics", element: <h1 className="title">Analytics</h1> },
-        { path: "reports", element: <h1 className="title">Reports</h1> },
+        // { path: "Settings", element: <SettingsPage />},
         { path: "Deconnexion", element: <h1 className="title">Deconnexion</h1> },
-        { path: "products", element: <h1 className="title">Products</h1> },
-        { path: "new-product", element: <h1 className="title">New Product</h1> },
-        { path: "inventory", element: <h1 className="title">Inventory</h1> },
-        { path: "settings", element: <h1 className="title">Settings</h1> },
       ],
     },
   ]);
