@@ -14,28 +14,38 @@ export default function Register() {
     const [data, setData] = useState({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        role: 'etudiant'
     });
 
     const registerUser = async (e) => {
         e.preventDefault();
-        const { name, email, password } = data
+        const { name, email, password, role } = data;
+
         try {
+            const response = await axios.post("http://localhost:8000/register",
+                { name, email, password, role },
+                { withCredentials: true }
+            );
 
-            const { data } = await axios.post("http://localhost:8000/register", { name, email, password }, { withCredentials: true });
+            if (response.data.error) {
+                toast.error(response.data.error); // Afficher l'erreur retournée par le backend
+            } else {
+                setData({ name: '', email: '', password: '', role: 'etudiant' });
 
-            if (data.error) {
-                toast.error(data.message);
-            }
-            else {
-                setData({});
-                navigate('/dashboard');
+                // Redirection en fonction du rôle
+                if (response.data.user?.role === "enseignant") {
+                    navigate('/enseignant');
+                } else {
+                    navigate('/etudiant'); // Par défaut, rediriger les autres utilisateurs ici
+                }
             }
         } catch (error) {
-            console.log(error);
+            console.error("Erreur lors de l'inscription :", error);
+            toast.error("Une erreur s'est produite. Veuillez réessayer.");
         }
+    };
 
-    }
 
     return (
         <section className="m-8 flex">

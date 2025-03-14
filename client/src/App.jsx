@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import Layout from "@/routes/layout";
 import DashboardPage from "@/routes/dashboard/page";
 import StudentAssignmentsPage from "@/routes/Sujets/page";
-import TeacherCreateTopicPage from "./pages/Test";
 import StudentSubmitResponsePage from "@/routes/Reponse/page";
 import StudentViewCorrectionsPage from "@/routes/Correction/page";
 import Logout from "./pages/Logout";
@@ -15,6 +14,17 @@ import Register from "./pages/Register";
 
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "@/contexts/user-context";
+import { ProtectedRoutes } from "@/contexts/protected-routes";
+import PageNotFound from "./pages/PageNotFound";
+
+import SettingsPage from "@/routes/settings/SettingsPage";
+import CorrectionAuto from "@/routes/intelligent/CorrectionAuto";
+import ApprentissageAuto from "@/routes/intelligent/Learn";
+import IntelligentLayout from "@/routes/intelligent/Layout";
+import DepotSujet from "@/routes/enseignant/DepotSujet";
+import GestionModelesCorrection from "@/routes/enseignant/GestionModelesCorrection";
+import Statistique from "@/routes/enseignant/Statistique";
+
 
 function App() {
   const router = createBrowserRouter([
@@ -31,36 +41,53 @@ function App() {
       element: <Register />,
     },
     {
-      path: "/dashboard",
-      element: <Layout />,
+      path: "*",
+      element: <PageNotFound />,
+    },
+    { path: "logout", element: <Logout /> },
+
+    {
+      path: "/enseignant",
+      element: <ProtectedRoutes />,
       children: [
         {
-          index: true,
-          element: <DashboardPage />,
-        },
-        {
-          path: "/dashboard/sujets",
-          element: <StudentAssignmentsPage />,
-        },
-        {
-          path: "/dashboard/soumettre",
-          element: <StudentSubmitResponsePage />,
-        },
-        {
-          path: "/dashboard/correction",
-          element: <StudentViewCorrectionsPage />,
-        },
-        {
-          path: "/dashboard/topic",
-          element: <TeacherCreateTopicPage />,
-        },
-        {
-          path: "/dashboard/logout",
-          element: <Logout />,
+          element: <Layout />,
+          children: [
+            { index: true, element: <Statistique /> },
+            { path: "statistique", element: <Statistique /> },
+            { path: "exercices", element: <DepotSujet /> },
+            { path: "correction", element: < GestionModelesCorrection /> },
+            { path: "settings", element: <SettingsPage /> },
+
+            {
+              path: "Intelligent",
+              element: <IntelligentLayout />,
+              children: [
+                { path: "correctionAutomatique", element: <CorrectionAuto /> },
+                { path: "apprentissage", element: <ApprentissageAuto /> },
+              ],
+            },
+          ],
         },
 
       ],
     },
+    {
+      path: "/etudiant",
+      element: <ProtectedRoutes />, // Vérifie l'authentification
+      children: [
+        {
+          element: <Layout />, // Contient le header, sidebar, etc.
+          children: [
+            { index: true, element: <DashboardPage /> },
+            { path: "sujets", element: <StudentAssignmentsPage /> },
+            { path: "soumettre", element: <StudentSubmitResponsePage /> },
+            { path: "correction", element: <StudentViewCorrectionsPage /> },
+          ],
+        },
+      ],
+    },
+
   ]);
 
   return (

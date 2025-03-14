@@ -3,8 +3,12 @@ const dotenv = require("dotenv").config();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+<<<<<<< HEAD
 const passport = require("passport");
 const session = require("express-session");
+=======
+const path = require('path');
+>>>>>>> 473cca35c3deb7070ad423671532d3416beff9b4
 
 const app = express();
 
@@ -53,7 +57,14 @@ require("./config/passport")(passport);
 // Routes
 app.use("/", require("./routes/authRoutes"));
 app.use("/", require("./routes/submissionRoutes"));
+<<<<<<< HEAD
 app.use("/", require("./routes/topicRoutes")); // Ajout des routes pour les topics
+=======
+app.use("/", require("./routes/topicRoutes"));
+
+// Dossier des fichiers statiques
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+>>>>>>> 473cca35c3deb7070ad423671532d3416beff9b4
 
 // Lancement du serveur
 app.listen(port, () => {

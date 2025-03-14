@@ -11,6 +11,7 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
+<<<<<<< HEAD
         // Rendre le password optionnel pour les connexions OAuth
         required: function() {
             return !this.googleId && !this.githubId && !this.microsoftId;
@@ -25,6 +26,11 @@ const userSchema = new Schema({
         default: 'student'
     },
     profilePicture: String
+=======
+        required: true,
+    },
+    role: String,
+>>>>>>> 473cca35c3deb7070ad423671532d3416beff9b4
 }, { timestamps: true });
 
 const userModel = mongoose.model('User', userSchema);

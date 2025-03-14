@@ -2,12 +2,15 @@ import { Link, useNavigate } from "react-router-dom";
 import pattern from "../assets/images/pattern.png";
 import github from "../assets/images/github.svg";
 import { ArrowLeft } from 'lucide-react';
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { UserContext } from "@/contexts/user-context";
+
 
 export function Login() {
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext);
 
     const [data, setData] = useState({
         email: '',
@@ -18,15 +21,21 @@ export function Login() {
         e.preventDefault();
         const { email, password } = data;
         try {
-            console.log("Sending login request with:", { email, password });
 
             const { data } = await axios.post("http://localhost:8000/login", { email, password }, { withCredentials: true });
             toast.success(data.message)
             if (data.error) {
                 toast.error(data.error);
             } else {
-                setData({});
-                navigate('/dashboard');
+                setUser(data.user);
+                // Redirection selon le rôle
+                if (data.user.role === "enseignant") {
+                    navigate('/enseignant');
+                } else if (data.user.role === "etudiant") {
+                    navigate('/etudiant');
+                } else {
+                    navigate('/etudiant'); // Page générique si le rôle est inconnu
+                }
             }
         } catch (error) {
             console.error("Login failed:", error);
@@ -86,9 +95,9 @@ export function Login() {
 
                     <div className="flex items-center justify-between gap-2 mt-6">
                         <div className="flex items-center">
-                            <input type="checkbox" id="newsletter" className="-ml-2.5" />
-                            <label htmlFor="newsletter" className="font-medium text-gray-700">
-                                Souscrire à la newsletter
+                            <input type="checkbox" id="connect" className="w-6 h-6 -ml-2.5" />
+                            <label htmlFor="connect" className="font-medium text-gray-700 ml-2">
+                                Rester connecté
                             </label>
                         </div>
                         <a href="#" className="font-medium text-gray-900">
