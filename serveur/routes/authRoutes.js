@@ -4,13 +4,6 @@ const cors = require("cors");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { test, registerUser, loginUser, getProfile, logoutUser } = require("../controllers/authController");
-const {
-    test,
-    registerUser,
-    loginUser,
-    getProfile,
-    logoutUser,
-} = require("../controllers/authController");
 const { verifyToken, checkRole } = require("../middlewares/authMiddleware");
 
 // Middleware CORS
@@ -21,20 +14,13 @@ router.use(
     })
 );
 
-// Routes classiques
-router.get("/", test);
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/profile", getProfile);
-router.post("/logout", logoutUser);
 // Routes publiques
-router.get("/", test);
+router.get("/test", test); // Renommé pour éviter confusion avec la racine "/"
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 // Routes protégées (nécessitent d'être connecté)
-router.get("/profile", getProfile)
-
+router.get("/profile", verifyToken, getProfile); // Ajout de verifyToken pour sécuriser
 router.post("/logout", verifyToken, logoutUser);
 
 // Routes spécifiques aux rôles
@@ -52,15 +38,12 @@ router.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-        // Rediriger vers la page d'accueil du client
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
     }
 );
@@ -71,15 +54,12 @@ router.get(
     "/auth/github/callback",
     passport.authenticate("github", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-        // Rediriger vers la page d'accueil du client
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
     }
 );
@@ -90,15 +70,12 @@ router.get(
     "/auth/microsoft/callback",
     passport.authenticate("microsoft", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-        // Rediriger vers la page d'accueil du client
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
     }
 );
