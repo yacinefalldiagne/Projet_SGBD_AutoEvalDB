@@ -1,3 +1,4 @@
+// index.js
 const express = require("express");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
@@ -11,12 +12,7 @@ const app = express();
 
 // Connexion à MongoDB
 mongoose
-    .connect(process.env.MONGO_URI, { 
-        useNewUrlParser: true, 
-        useUnifiedTopology: true, 
-        serverSelectionTimeoutMS: 5000, // Ajouter un timeout plus court pour la sélection du serveur
-        socketTimeoutMS: 45000, 
-    })
+    .connect(process.env.MONGO_URI) // Supprimez les options obsolètes
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("DB not connected", err));
 
@@ -48,17 +44,18 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Configuration de Passport (nous allons créer ce fichier)
+// Configuration de Passport
 require("./config/passport")(passport);
 
 // Routes
 app.use("/", require("./routes/authRoutes"));
 app.use("/", require("./routes/submissionRoutes"));
-app.use("/", require("./routes/topicRoutes")); // Ajout des routes pour les topics
 app.use("/", require("./routes/topicRoutes"));
+app.use("/", require("./routes/settingsRoutes"));
 
 // Dossier des fichiers statiques
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/profile-images', express.static(path.join(__dirname, 'uploads/profile-images')));
 
 // Lancement du serveur
 app.listen(port, () => {
