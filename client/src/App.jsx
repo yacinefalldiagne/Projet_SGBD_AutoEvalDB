@@ -24,6 +24,7 @@ import IntelligentLayout from "@/routes/intelligent/Layout";
 import DepotSujet from "@/routes/enseignant/DepotSujet";
 import GestionModelesCorrection from "@/routes/enseignant/GestionModelesCorrection";
 import Statistique from "@/routes/enseignant/Statistique";
+import DevoirEtudiant from "@/routes/enseignant/DevoirEtudiant";
 
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
             { path: "exercices", element: <DepotSujet /> },
             { path: "correction", element: < GestionModelesCorrection /> },
             { path: "settings", element: <SettingsPage /> },
+            { path: "devoirs", element: <DevoirEtudiant /> },
 
             {
               path: "Intelligent",

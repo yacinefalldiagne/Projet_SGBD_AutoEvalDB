@@ -4,13 +4,7 @@ const cors = require("cors");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { test, registerUser, loginUser, getProfile, logoutUser } = require("../controllers/authController");
-const {
-    test,
-    registerUser,
-    loginUser,
-    getProfile,
-    logoutUser,
-} = require("../controllers/authController");
+
 const { verifyToken, checkRole } = require("../middlewares/authMiddleware");
 
 // Middleware CORS
@@ -23,12 +17,8 @@ router.use(
 
 // Routes classiques
 router.get("/", test);
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/profile", getProfile);
-router.post("/logout", logoutUser);
+
 // Routes publiques
-router.get("/", test);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
@@ -61,7 +51,7 @@ router.get(
         // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         // Rediriger vers la page d'accueil du client
-        res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+        res.redirect(`${process.env.CLIENT_URL}/etudiant`);
     }
 );
 
@@ -80,7 +70,7 @@ router.get(
         // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         // Rediriger vers la page d'accueil du client
-        res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+        res.redirect(`${process.env.CLIENT_URL}/etudiant`);
     }
 );
 

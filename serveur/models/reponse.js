@@ -1,17 +1,17 @@
-// reponse.model.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const reponseSchema = new Schema({
     title: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Topic',
         required: true
     },
     file: {
         type: String
     },
     student: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
