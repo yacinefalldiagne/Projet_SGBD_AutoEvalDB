@@ -8,7 +8,7 @@ import DashboardPage from "@/routes/dashboard/page";
 import StudentAssignmentsPage from "@/routes/Sujets/page";
 import StudentSubmitResponsePage from "@/routes/Reponse/page";
 import StudentViewCorrectionsPage from "@/routes/Correction/page";
-
+import SettingsPage from "@/routes/Settings/page";
 function App() {
   const router = createBrowserRouter([
     {
@@ -23,7 +23,7 @@ function App() {
         { path: "Sujets", element: <StudentAssignmentsPage /> },
         { path: "Soumettre reponse", element: <StudentSubmitResponsePage /> },
         { path: "Consulter correction", element: <StudentViewCorrectionsPage /> },
-        // { path: "Settings", element: <SettingsPage />},
+        { path: "Settings", element: <SettingsPage /> },
         { path: "Deconnexion", element: <h1 className="title">Deconnexion</h1> },
       ],
     },

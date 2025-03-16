@@ -243,26 +243,6 @@ const SettingsPage = () => {
                 </form>
             </div>
 
-            <div className="card">
-                <div className="card-header flex items-center gap-x-4">
-                    <div className="w-fit rounded-lg bg-red-500/20 p-2 text-red-500 transition-colors dark:bg-red-600/20 dark:text-red-600">
-                        <LogOut size={26} />
-                    </div>
-                    <p className="card-title text-lg font-semibold text-slate-900 dark:text-slate-50">
-                        Déconnexion
-                    </p>
-                </div>
-                <div className="card-body bg-slate-100 dark:bg-slate-950 p-4">
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                    >
-                        <LogOut size={20} />
-                        Se déconnecter
-                    </button>
-                </div>
-            </div>
-
             <Footer />
         </div>
     );

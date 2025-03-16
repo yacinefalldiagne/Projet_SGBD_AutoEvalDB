@@ -45,11 +45,7 @@ export const navbarLinks = [
                 icon: Settings,
                 path: "/settings",
             },
-            {
-                label: "Deconnexion",
-                icon: LogOut,
-                path: "/Deconnexion",
-            },
+            
         ],
     },
     
