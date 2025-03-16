@@ -1,12 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import { Paperclip, Trash2, CirclePlus, Eye, BookOpen, Calendar, FileText } from "lucide-react";
+import { Paperclip, Trash2, Coffee, Eye, BookOpen, Calendar, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Card, { CardContent } from "@/components/ui/Card";
 import Modal from "@/components/ui/Modal";
-import ModalDialog from "@/components/ui/ModalDialog"; // Importer le nouveau composant
+import ModalDialog from "@/components/ui/ModalDialog";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import image from '../../assets/images/3926922.png';
 
 function GestionModelesCorrection() {
     const [modeles, setModeles] = useState([]);
@@ -40,8 +41,7 @@ function GestionModelesCorrection() {
 
     useEffect(() => {
         fetchAssignments();
-        const interval = setInterval(fetchAssignments, 10000);
-        return () => clearInterval(interval);
+
     }, [fetchAssignments]);
 
     const handleFileUpload = (event) => {
@@ -142,7 +142,7 @@ function GestionModelesCorrection() {
         } catch (error) {
             console.error('Erreur lors de la publication du devoir :', error);
             setError('Erreur lors de la publication du devoir : ' + (error.response?.data?.message || error.message));
-            setConfirmModalOpen(false); // Ferme la modale même en cas d'erreur
+            setConfirmModalOpen(false);
         } finally {
             setLoading(false);
         }
@@ -156,116 +156,122 @@ function GestionModelesCorrection() {
         }
     };
 
+    // Gestion des cas de chargement, erreur et absence de sujets
+    if (fetchingAssignments) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full">
+                <p className="text-gray-500 dark:text-gray-400">Chargement des sujets...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full">
+                <img src={image} alt="Erreur" className="w-1/5 h-auto" />
+                <p className="text-red-700 dark:text-slate-300 mt-4">{error}</p>
+            </div>
+        );
+    }
+
+    if (assignments.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full">
+                <img src={image} alt="Aucun sujet soumis" className="w-1/2 h-auto" />
+                <p className="text-slate-700 dark:text-slate-300 mt-4">Aucun sujet soumis</p>
+            </div>
+        );
+    }
+
     return (
         <div>
             <h1 className="text-lg font-bold text-center text-slate-900 dark:text-slate-50">Modèles de correction</h1>
             <div className="rounded-lg border shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                 <div className="p-4">
-                    {fetchingAssignments ? (
-                        <div className="card col-span-full">
-                            <div className="card-body text-center">
-                                <p className="text-gray-500 dark:text-gray-400">Chargement des sujets...</p>
-                            </div>
-                        </div>
-                    ) : loading ? (
+                    {loading ? (
                         <div className="card col-span-full">
                             <div className="card-body text-center">
                                 <p className="text-gray-500 dark:text-gray-400">Traitement en cours...</p>
                             </div>
                         </div>
-                    ) : error ? (
-                        <div className="card col-span-full">
-                            <div className="card-body text-center">
-                                <p className="text-red-500">{error}</p>
-                            </div>
-                        </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {assignments.length > 0 ? (
-                                assignments.map((assignment) => (
-                                    <div
-                                        key={assignment?._id || assignment?.id}
-                                        className="card hover:shadow-lg transition-shadow duration-200"
-                                    >
-                                        <div className="card-header">
-                                            <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">
-                                                <BookOpen size={26} />
-                                            </div>
-                                            <p className="card-title">{assignment.title}</p>
+                            {assignments.map((assignment) => (
+                                <div
+                                    key={assignment?._id || assignment?.id}
+                                    className="card hover:shadow-lg transition-shadow duration-200"
+                                >
+                                    <div className="card-header">
+                                        <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">
+                                            <BookOpen size={26} />
                                         </div>
-                                        <div className="card-body bg-slate-100 transition-colors dark:bg-slate-950">
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                                {assignment.description}
-                                            </p>
-                                            <div className="flex flex-col gap-y-2">
-                                                <div className="flex items-center gap-x-2 text-sm">
-                                                    <Calendar size={16} className="text-blue-500 dark:text-blue-600" />
-                                                    <span>Date d'ajout: {new Date(assignment.date).toLocaleDateString()}</span>
-                                                </div>
-                                                {assignment.deadline && (
-                                                    <div className="flex items-center gap-x-2 text-sm">
-                                                        <Calendar size={16} className="text-red-500" />
-                                                        <span>Date échéance: {new Date(assignment.deadline).toLocaleDateString()}</span>
-                                                    </div>
-                                                )}
-                                                <div className="flex items-center gap-x-2 text-sm">
-                                                    <FileText size={16} className="text-blue-500 dark:text-blue-600" />
-                                                    <span>
-                                                        Fichier :{' '}
-                                                        {assignment.fileUrl ? (
-                                                            <a
-                                                                href={`${BASE_URL}${assignment.fileUrl}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-blue-500 hover:underline"
-                                                            >
-                                                                Consulter
-                                                            </a>
-                                                        ) : (
-                                                            'Aucun fichier'
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-x-2 text-sm">
-                                                    <span>Statut : {assignment.status === 'brouillon' ? 'Brouillon' : 'Publié'}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Boutons pour les corrections */}
-                                            {assignment.status === 'brouillon' && (
-                                                <>
-                                                    <button
-                                                        className="mt-4 inline-flex items-center gap-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                                                        onClick={() => handlePublishTopic(assignment._id)}
-                                                    >
-                                                        Publier le devoir
-                                                    </button>
-                                                    <button
-                                                        className="mt-1 inline-flex items-center gap-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                                                        onClick={() => openModalForCorrections(assignment._id)}
-                                                    >
-                                                        Générer des corrections
-                                                    </button>
-                                                </>
-                                            )}
-                                            <button
-                                                className="mt-1 inline-flex items-center gap-x-2 px-4 py-2 bg-stone-500 text-white rounded-lg hover:bg-stone-600 transition-colors"
-                                                onClick={() => openModalForViewing(assignment._id)}
-                                            >
-                                                Consulter les corrections
-                                            </button>
-                                        </div>
+                                        <p className="card-title">{assignment.title}</p>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="col-span-full card">
-                                    <div className="card-body text-center">
-                                        <p className="text-gray-500 dark:text-gray-400">
-                                            Aucun devoir trouvé.
+                                    <div className="card-body bg-slate-100 transition-colors dark:bg-slate-950">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                            {assignment.description}
                                         </p>
+                                        <div className="flex flex-col gap-y-2">
+                                            <div className="flex items-center gap-x-2 text-sm">
+                                                <Calendar size={16} className="text-blue-500 dark:text-blue-600" />
+                                                <span>Date d'ajout: {new Date(assignment.date).toLocaleDateString()}</span>
+                                            </div>
+                                            {assignment.deadline && (
+                                                <div className="flex items-center gap-x-2 text-sm">
+                                                    <Calendar size={16} className="text-red-500" />
+                                                    <span>Date échéance: {new Date(assignment.deadline).toLocaleDateString()}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-x-2 text-sm">
+                                                <FileText size={16} className="text-blue-500 dark:text-blue-600" />
+                                                <span>
+                                                    Fichier :{' '}
+                                                    {assignment.fileUrl ? (
+                                                        <a
+                                                            href={`${BASE_URL}${assignment.fileUrl}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-500 hover:underline"
+                                                        >
+                                                            Consulter
+                                                        </a>
+                                                    ) : (
+                                                        'Aucun fichier'
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-x-2 text-sm">
+                                                <Coffee size={16} className="text-blue-500 dark:text-blue-600" />
+                                                <span>Statut : {assignment.status === 'brouillon' ? 'Brouillon' : 'Publié'}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Boutons pour les corrections */}
+                                        {assignment.status === 'brouillon' && (
+                                            <>
+                                                <button
+                                                    className="mt-4 inline-flex items-center gap-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                                    onClick={() => handlePublishTopic(assignment._id)}
+                                                >
+                                                    Publier le devoir
+                                                </button>
+                                                <button
+                                                    className="mt-1 inline-flex items-center gap-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                                    onClick={() => openModalForCorrections(assignment._id)}
+                                                >
+                                                    Générer des corrections
+                                                </button>
+                                            </>
+                                        )}
+                                        <button
+                                            className="mt-1 inline-flex items-center gap-x-2 px-4 py-2 bg-stone-500 text-white rounded-lg hover:bg-stone-600 transition-colors"
+                                            onClick={() => openModalForViewing(assignment._id)}
+                                        >
+                                            Consulter les corrections
+                                        </button>
                                     </div>
                                 </div>
-                            )}
+                            ))}
                         </div>
                     )}
                 </div>
@@ -274,13 +280,6 @@ function GestionModelesCorrection() {
             {/* Modal pour générer la correction */}
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
                 <h2 className="text-xl font-bold mb-4">📑 Gestion des Modèles de Correction</h2>
-                {/* <div className="border p-4 rounded-lg bg-gray-100">
-                    <label className="cursor-pointer flex items-center space-x-2">
-                        <Paperclip size={24} className="text-gray-500" />
-                        <span className="text-gray-600">Ajouter un modèle</span>
-                        <input type="file" accept=".txt,.pdf" onChange={handleFileUpload} className="hidden" />
-                    </label>
-                </div> */}
                 <div className="mt-6 space-y-4">
                     {loading && <p className="text-gray-500 text-center">Génération de la correction en cours... <br /> Cela pourrait prendre un peu de temps. </p>}
                     {error && <p className="text-red-500 text-center">{error}</p>}

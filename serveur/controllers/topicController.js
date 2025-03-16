@@ -8,8 +8,9 @@ const path = require('path');
 const { extractTextFromPDF } = require('../services/pdfServices');
 const { generateCorrection } = require('../services/ollamaService');
 const PDFDocument = require('pdfkit');
+const axios = require('axios');
 
-const availableModels = ['deepseek-r1:1.5b'];
+const availableModels = ['deepseek-coder'];
 
 // Vérifier l'authentification de l'utilisateur et obtenir son ID
 const verifyToken = (req) => {
@@ -97,7 +98,7 @@ const getTopic = async (req, res) => {
         const { token } = req.cookies;
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        const user = await User.findById(userId); // Récupérer l'utilisateur pour déterminer son rôle
+        const user = await User.findById(userId);
 
         // Vérifier si l'utilisateur existe
         if (!user) {
@@ -107,10 +108,10 @@ const getTopic = async (req, res) => {
         let topics;
 
         if (user.role === 'enseignant') {
-            // Les enseignants voient tous leurs devoirs (brouillon et public)
+
             topics = await Topic.find({ teacher: userId }).populate('teacher', 'name email');
         } else if (user.role === 'etudiant') {
-            // Les étudiants ne voient que les devoirs publics
+
             topics = await Topic.find({ status: 'public' }).populate('teacher', 'name email');
         } else {
             return res.status(403).json({ message: "Rôle non autorisé." });
@@ -134,7 +135,7 @@ const getTopic = async (req, res) => {
         res.status(500).json({ message: "Erreur serveur. Veuillez réessayer." });
     }
 };
-// Publier un devoir (changer le statut de draft à public)
+// Publier un devoir (changer le statut de brouillon à public)
 const publishTopic = async (req, res) => {
     try {
         const { token } = req.cookies;
@@ -222,15 +223,26 @@ const generateCorrectionsForTopic = async (req, res) => {
         const pdfText = await extractTextFromPDF(filePath);
 
         console.log('Début de la génération de la correction...');
-        const correction = await generateCorrection(pdfText, availableModels[0]);
-        console.log('Correction générée :', correction);
+        const correctionResult = await generateCorrection(pdfText, availableModels[0]);
+        console.log('Correction générée :', correctionResult);
 
         console.log('Ajout de la correction au topic...');
-        topic.corrections.push(correction); // Ajouter la nouvelle correction au tableau
+        topic.corrections.push({
+            model: correctionResult.model,
+            correction: correctionResult.correction,
+            score: correctionResult.score, // Ajouter la note au modèle
+        });
         await topic.save();
         console.log('Topic sauvegardé avec succès :', topic);
 
-        res.status(200).json({ message: 'Correction générée avec succès', correction });
+        res.status(200).json({
+            message: 'Correction générée avec succès',
+            correction: {
+                model: correctionResult.model,
+                correction: correctionResult.correction,
+                score: correctionResult.score,
+            }
+        });
     } catch (error) {
         console.error('Erreur dans generateCorrectionsForTopic :', error);
         res.status(500).json({ message: 'Erreur lors de la génération de la correction : ' + error.message });

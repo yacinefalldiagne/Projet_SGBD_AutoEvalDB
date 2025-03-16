@@ -1,3 +1,7 @@
+import { useState } from "react";
+import Switch from "@/components/ui/Switch";
+import Button from "@/components/ui/Button";
+
 // client/src/routes/settings/SettingsPage.jsx
 import { useState, useEffect } from "react";
 import Switch from "@/components/ui/Switch"; 
@@ -10,7 +14,22 @@ function SettingsPage() {
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(true);
     const [language, setLanguage] = useState("fr");
-    const [profileImage, setProfileImage] = useState(null);
+
+    return (
+        <div className="p-6 max-w-3xl mx-auto space-y-6">
+            <h1 className="text-2xl font-bold">Paramètres du compte</h1>
+
+            {/* Informations personnelles */}
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+                <h2 className="text-lg font-semibold mb-3">Informations personnelles</h2>
+
+
+                <input type="text" placeholder="Nom" className="w-full p-2 border rounded" />
+                <input type="text" placeholder="Prénom" className="w-full p-2 border mt-2 rounded" />
+                <Button className="mt-3">Mettre à jour</Button>
+            </div>
+
+const [profileImage, setProfileImage] = useState(null);
     const [name, setName] = useState("");
     const [mustResetPassword, setMustResetPassword] = useState(false);
     const navigate = useNavigate();
@@ -199,6 +218,10 @@ function SettingsPage() {
                     </Button>
                 </section>
 
+            {/* Actions */}
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+                <h2 className="text-lg font-semibold mb-3">Actions du compte</h2>
+                <Button className="bg-red-500 hover:bg-red-600 text-white mt-3">Supprimer le compte</Button>
                 {/* Actions */}
                 <section>
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Actions</h2>

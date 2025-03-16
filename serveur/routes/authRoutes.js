@@ -44,14 +44,20 @@ router.get(
     (req, res) => {
         // Création du token JWT
         const token = jwt.sign(
-            { email: req.user.email, id: req.user._id, name: req.user.name },
+            { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
         // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         // Rediriger vers la page d'accueil du client
-        res.redirect(`${process.env.CLIENT_URL}/etudiant`);
+        if (req.user.role === "enseignant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else if (req.user.role === "etudiant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`); // Par défaut
+        }
     }
 );
 
@@ -63,14 +69,20 @@ router.get(
     (req, res) => {
         // Création du token JWT
         const token = jwt.sign(
-            { email: req.user.email, id: req.user._id, name: req.user.name },
+            { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
         // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         // Rediriger vers la page d'accueil du client
-        res.redirect(`${process.env.CLIENT_URL}/etudiant`);
+        if (req.user.role === "enseignant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else if (req.user.role === "etudiant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`); // Par défaut
+        }
     }
 );
 
