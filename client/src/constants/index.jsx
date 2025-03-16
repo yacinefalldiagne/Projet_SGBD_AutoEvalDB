@@ -1,4 +1,4 @@
-import { CloudCog, BookOpen, ChartColumn, NotepadText, Edit, Home, Settings, SpellCheck, FileText, Send, LogOut } from "lucide-react";
+import { CloudCog, BookOpen, ChartColumn, NotepadText, Edit, Home, Settings, SpellCheck, FileText, Send, LogOut, Package } from "lucide-react";
 
 
 import ProfileImage from "@/assets/profile-image.jpg";
@@ -39,6 +39,11 @@ export const navbarLinksProf = [
                 label: "Dépôt de Sujet",
                 icon: NotepadText,
                 path: "/enseignant/exercices",
+            },
+            {
+                label: "Liste des devoirs",
+                icon: Package,
+                path: "/enseignant/devoirs",
             },
             {
                 label: "Correction",

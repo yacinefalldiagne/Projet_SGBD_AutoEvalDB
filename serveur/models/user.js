@@ -12,7 +12,7 @@ const userSchema = new Schema({
     password: {
         type: String,
         // Rendre le password optionnel pour les connexions OAuth
-        required: function() {
+        required: function () {
             return !this.googleId && !this.githubId && !this.microsoftId;
         }
     },
@@ -21,11 +21,11 @@ const userSchema = new Schema({
     microsoftId: String,
     role: {
         type: String,
-        enum: ['student', 'teacher'],
-        default: 'student'
+        enum: ['etudiant', 'enseignant'],
+        default: 'etudiant'
     },
     profilePicture: String,
-    
+
     role: String,
 }, { timestamps: true });
 
