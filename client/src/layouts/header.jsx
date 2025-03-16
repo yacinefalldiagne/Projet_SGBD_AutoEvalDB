@@ -1,21 +1,25 @@
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
-import { Bell, ChevronsLeft, Moon, Search, Sun, User, LogOut } from "lucide-react";
+import { Bell, ChevronsLeft, Moon, Search, Sun, User, LogOut, Settings } from "lucide-react";
 import PropTypes from "prop-types";
 
 export const Header = ({ collapsed, setCollapsed }) => {
     const { theme, setTheme } = useTheme();
-    const [isProfileOpen, setIsProfileOpen] = useState(false); // État pour le menu déroulant
+    const [isProfileOpen, setIsProfileOpen] = useState(false); 
 
-    // Fonction de déconnexion
     const handleLogout = () => {
-        localStorage.removeItem("token"); // Supprime le token (si utilisé)
-        window.location.href = "/home"; // Redirige vers la page d'accueil
+        localStorage.removeItem("token"); 
+        window.location.href = "/home"; 
+    };
+
+    const handleSettings = () => {
+        window.location.href = "/settings"; 
+        setIsProfileOpen(false); 
     };
 
     return (
         <header className="relative z-10 flex h-[60px] items-center justify-between bg-white px-6 shadow-md transition-colors dark:bg-slate-900">
-            {/* Partie gauche : Bouton collapse + Recherche */}
+            {}
             <div className="flex items-center gap-x-4">
                 <button
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
@@ -38,7 +42,7 @@ export const Header = ({ collapsed, setCollapsed }) => {
                 </div>
             </div>
 
-            {/* Partie droite : Thème + Profil */}
+            {}
             <div className="flex items-center gap-x-4">
                 <button
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
@@ -48,7 +52,7 @@ export const Header = ({ collapsed, setCollapsed }) => {
                     <Moon size={20} className="hidden dark:block text-gray-300" />
                 </button>
 
-                {/* Bouton Profil avec icône */}
+                {}
                 <div className="relative">
                     <button
                         className="p-2 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
@@ -57,9 +61,16 @@ export const Header = ({ collapsed, setCollapsed }) => {
                         <User size={24} className="text-gray-600 dark:text-gray-300" />
                     </button>
 
-                    {/* Menu déroulant */}
+                    {}
                     {isProfileOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg py-2 border border-gray-200 dark:border-slate-700 animate-fade-in">
+                            <button
+                                onClick={handleSettings}
+                                className="flex items-center gap-x-2 w-full px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                <Settings size={18} className="text-blue-500" />
+                                Paramètres
+                            </button>
                             <button
                                 onClick={handleLogout}
                                 className="flex items-center gap-x-2 w-full px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
@@ -80,7 +91,6 @@ Header.propTypes = {
     setCollapsed: PropTypes.func,
 };
 
-// Animation personnalisée dans Tailwind (à ajouter dans tailwind.config.js si nécessaire)
 const customStyles = `
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
