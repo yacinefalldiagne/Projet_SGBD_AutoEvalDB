@@ -11,11 +11,11 @@ const app = express();
 
 // Connexion à MongoDB
 mongoose
-    .connect(process.env.MONGO_URI, { 
-        useNewUrlParser: true, 
-        useUnifiedTopology: true, 
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000, // Ajouter un timeout plus court pour la sélection du serveur
-        socketTimeoutMS: 45000, 
+        socketTimeoutMS: 45000,
     })
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("DB not connected", err));
@@ -55,7 +55,6 @@ require("./config/passport")(passport);
 app.use("/", require("./routes/authRoutes"));
 app.use("/", require("./routes/submissionRoutes"));
 app.use("/", require("./routes/topicRoutes")); // Ajout des routes pour les topics
-app.use("/", require("./routes/topicRoutes"));
 
 // Dossier des fichiers statiques
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

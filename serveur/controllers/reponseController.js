@@ -10,7 +10,7 @@ const fs = require('fs');
 const { extractTextFromPDF } = require('../services/pdfServices');
 const { generateCorrectionStudent } = require('../services/ollamaService');
 
-const availableModels = ['deepseek-r1:1.5b'];
+const availableModels = ['deepseek-coder'];
 
 // Vérifier l'authentification de l'utilisateur et obtenir son ID
 const verifyToken = (req) => {
@@ -29,7 +29,7 @@ const verifyToken = (req) => {
 // Configuration de Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/');  // Le dossier où les fichiers seront stockés
+        cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
@@ -46,35 +46,34 @@ const upload = multer({
         }
         cb(new Error('Seuls les fichiers PDF, DOC, DOCX sont acceptés'));
     },
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
+    limits: { fileSize: 10 * 1024 * 1024 }
 }).single('file');
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY; // Clé de chiffrement
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-const IV_LENGTH = 16; // Longueur de l'IV
+const IV_LENGTH = 16;
 
 // Fonction pour chiffrer le fichier
 const encryptFile = (filePath) => {
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     const input = fs.createReadStream(filePath);
-    const encryptedFilePath = filePath + '.enc'; // Nouveau nom pour le fichier chiffré
+    const encryptedFilePath = filePath + '.enc';
     const output = fs.createWriteStream(encryptedFilePath);
 
     input.pipe(cipher).pipe(output);
 
     output.on('finish', () => {
-        // Supprimer le fichier original après chiffrement
         fs.unlinkSync(filePath);
     });
 
-    return encryptedFilePath; // Retourne le chemin du fichier chiffré
+    return encryptedFilePath;
 };
 
 // Fonction pour déchiffrer le fichier
 const decryptFile = (encryptedFilePath) => {
     return new Promise((resolve, reject) => {
-        const iv = Buffer.from(encryptedFilePath.slice(-IV_LENGTH));
+        const iv = Buffer.from(encryptedFilePath.slice(-IV_LENGTH)); // Note : ceci est incorrect, voir explication ci-dessous
         const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
         const input = fs.createReadStream(encryptedFilePath);
         const decryptedFilePath = encryptedFilePath.replace('.enc', '');
@@ -83,22 +82,18 @@ const decryptFile = (encryptedFilePath) => {
         input.pipe(decipher).pipe(output);
 
         output.on('finish', () => {
-            // console.log('Déchiffrement terminé pour :', decryptedFilePath);
             resolve(decryptedFilePath);
         });
 
         output.on('error', (error) => {
-            // console.error('Erreur lors du déchiffrement :', error);
             reject(error);
         });
 
         input.on('error', (error) => {
-            // console.error('Erreur sur le flux d\'entrée :', error);
             reject(error);
         });
 
         decipher.on('error', (error) => {
-            console.error('Erreur sur le decipher :', error);
             reject(error);
         });
     });
@@ -116,15 +111,14 @@ const createReponse = async (req, res) => {
             const filename = req.file ? req.file.filename : undefined;
 
             const filePath = path.join('uploads', filename);
-            const encryptedFilePath = encryptFile(filePath); // Chiffre le fichier
-            const encryptedFilename = path.basename(encryptedFilePath); // Nom du fichier chiffré
+            const encryptedFilePath = encryptFile(filePath);
+            const encryptedFilename = path.basename(encryptedFilePath);
 
             const studentId = student || userId;
             if (!studentId) {
                 return res.status(400).json({ message: "L'identifiant de l'étudiant est requis." });
             }
 
-            // Enregistrer la réponse dans la base de données
             const newReponse = new Reponse({
                 title: title,
                 student: studentId,
@@ -133,50 +127,11 @@ const createReponse = async (req, res) => {
 
             await newReponse.save();
 
-            // Récupérer le sujet (topic) pour obtenir les corrections disponibles
-            const topic = await Topic.findById(title);
-            console.log('Sujet trouvé :', topic);
-            if (!topic) {
-                return res.status(400).json({ message: "Le sujet spécifié n'existe pas." });
-            }
-            if (!topic.corrections || topic.corrections.length === 0) {
-                return res.status(400).json({ message: "Aucune correction modèle n'est disponible dans ce sujet." });
-            }
-
-            // Déchiffrer le fichier soumis pour extraire le texte
-            const decryptedFilePath = await decryptFile(encryptedFilePath);
-            console.log('Fichier déchiffré :', decryptedFilePath);
-            const submittedText = await extractTextFromPDF(decryptedFilePath);
-
-            // Sélectionner une correction modèle depuis topic.corrections
-            const teacherCorrectionText = topic.corrections[0].correction;
-            console.log('Correction modèle sélectionnée :', teacherCorrectionText);
-
-            // Générer la correction automatique avec Ollama
-            const correctionResult = await generateCorrectionStudent(submittedText, teacherCorrectionText, availableModels[0]);
-
-            // Enregistrer la correction automatique dans la base de données
-            const newCorrection = new Correction({
-                reponse: newReponse._id,
-                topic: title,
-                student: studentId,
-                submittedText: submittedText,
-                correction: correctionResult.correction,
-                model: correctionResult.model,
-                score: correctionResult.score,
-            });
-
-            await newCorrection.save();
-
             res.status(201).json({
-                message: 'Réponse soumise et corrigée avec succès !',
+                message: 'Réponse soumise avec succès !',
                 reponse: {
                     ...newReponse._doc,
                     fileUrl: encryptedFilename ? `/uploads/${encryptedFilename}` : null,
-                },
-                correction: {
-                    correction: correctionResult.correction,
-                    score: correctionResult.score,
                 },
             });
         } catch (error) {
@@ -186,7 +141,6 @@ const createReponse = async (req, res) => {
     });
 };
 
-// Mise à jour de la fonction `getReponse` pour inclure les corrections
 const getReponse = async (req, res) => {
     try {
         const reponses = await Reponse.find()
@@ -208,12 +162,12 @@ const getReponse = async (req, res) => {
                 reponseObj.fileUrl = null;
             }
 
-            // Inclure la correction associée, si elle existe
             const correction = await Correction.findOne({ reponse: reponse._id });
             if (correction) {
                 reponseObj.correction = {
                     correction: correction.correction,
                     score: correction.score,
+                    feedback: correction.feedback,
                 };
             }
 
@@ -227,27 +181,75 @@ const getReponse = async (req, res) => {
     }
 };
 
-// Nouvelle fonction pour récupérer les corrections d'un étudiant
-const getCorrectionsByStudent = async (req, res) => {
+const generateCorrectionForReponse = async (req, res) => {
     try {
-        const userId = verifyToken(req);
-        const corrections = await Correction.find({ student: userId })
-            .populate('reponse')
-            .populate('topic', 'title')
-            .populate('student', 'name email');
+        const { reponseId } = req.params;
 
-        if (!corrections.length) {
-            return res.status(404).json({ message: "Aucune correction trouvée pour cet étudiant." });
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId);
+
+        if (user.role !== 'enseignant') {
+            return res.status(403).json({ message: "Seuls les enseignants peuvent générer des corrections automatiques." });
         }
 
-        res.status(200).json(corrections);
+        const reponse = await Reponse.findById(reponseId)
+            .populate('title')
+            .populate('student', 'name email');
+        if (!reponse) {
+            return res.status(404).json({ message: "Réponse non trouvée." });
+        }
+
+        const topic = await Topic.findById(reponse.title);
+        if (!topic) {
+            return res.status(400).json({ message: "Le sujet spécifié n'existe pas." });
+        }
+        if (!topic.corrections || topic.corrections.length === 0) {
+            return res.status(400).json({ message: "Aucune correction modèle n'est disponible dans ce sujet." });
+        }
+
+        const encryptedFilePath = path.join('uploads', reponse.file);
+        if (!fs.existsSync(encryptedFilePath)) {
+            return res.status(404).json({ message: `Fichier chiffré non trouvé : ${reponse.file}` });
+        }
+
+        const decryptedFilePath = await decryptFile(encryptedFilePath);
+        const submittedText = await extractTextFromPDF(decryptedFilePath);
+        fs.unlinkSync(decryptedFilePath); // Supprimer le fichier déchiffré après usage
+
+        const teacherCorrectionText = topic.corrections[0].correction;
+        const correctionResult = await generateCorrectionStudent(submittedText, teacherCorrectionText, availableModels[0]);
+
+        console.log('Résultat de la correction :', correctionResult); // Log pour diagnostiquer
+
+        const newCorrection = new Correction({
+            reponse: reponse._id,
+            topic: reponse.title,
+            student: reponse.student,
+            submittedText: submittedText,
+            correction: correctionResult.correction,
+            model: correctionResult.model,
+            score: correctionResult.score,
+            feedback: correctionResult.feedback,
+        });
+
+        await newCorrection.save();
+
+        res.status(200).json({
+            message: 'Correction générée avec succès !',
+            correction: {
+                correction: correctionResult.correction,
+                score: correctionResult.score,
+                feedback: correctionResult.feedback,
+            },
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Erreur serveur. Veuillez réessayer." });
+        res.status(500).json({ message: error.message || 'Erreur serveur. Veuillez réessayer.' });
     }
 };
 
-// Nouvelle fonction pour récupérer toutes les corrections (pour les enseignants)
 const getAllCorrections = async (req, res) => {
     try {
         const userId = verifyToken(req);
@@ -301,11 +303,119 @@ const getReponsesByStudent = async (req, res) => {
     }
 };
 
+const getCorrectionsForStudent = async (req, res) => {
+    try {
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+
+        let corrections;
+        if (user.role === 'etudiant') {
+            corrections = await Correction.find({ student: userId })
+                .populate('student', 'name email')
+                .populate('topic', 'title description')
+                .select('submittedText correction score feedback createdAt');
+        } else if (user.role === 'enseignant') {
+            corrections = await Correction.find()
+                .populate('student', 'name email')
+                .populate('topic', 'title description')
+                .select('submittedText correction score feedback createdAt');
+        } else {
+            return res.status(403).json({ message: "Rôle non autorisé." });
+        }
+
+        if (!corrections.length) {
+            return res.status(404).json({ message: "Aucune correction trouvée." });
+        }
+
+        res.status(200).json(corrections);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
+    }
+};
+
+// Mettre à jour la note d'une correction
+const updateCorrectionScore = async (req, res) => {
+    try {
+        const { correctionId } = req.params;
+        const { score } = req.body;
+
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId);
+
+        if (user.role !== 'enseignant') {
+            return res.status(403).json({ message: "Seuls les enseignants peuvent ajuster les notes." });
+        }
+
+        if (score < 0 || score > 20) {
+            return res.status(400).json({ message: "La note doit être comprise entre 0 et 20." });
+        }
+
+        const correction = await Correction.findById(correctionId);
+        if (!correction) {
+            return res.status(404).json({ message: "Correction non trouvée." });
+        }
+
+        correction.score = score;
+        await correction.save();
+
+        res.status(200).json({ message: "Note mise à jour avec succès.", correction });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
+    }
+};
+
+// Mettre à jour le feedback d'une correction
+const updateCorrectionFeedback = async (req, res) => {
+    try {
+        const { correctionId } = req.params;
+        const { feedback } = req.body;
+
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId);
+
+        if (user.role !== 'enseignant') {
+            return res.status(403).json({ message: "Seuls les enseignants peuvent ajuster le feedback." });
+        }
+
+        if (!feedback || feedback.trim() === '') {
+            return res.status(400).json({ message: "Le feedback ne peut pas être vide." });
+        }
+
+        const correction = await Correction.findById(correctionId);
+        if (!correction) {
+            return res.status(404).json({ message: "Correction non trouvée." });
+        }
+
+        correction.feedback = feedback;
+        await correction.save();
+
+        res.status(200).json({ message: "Feedback mis à jour avec succès.", correction });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
+    }
+};
 module.exports = {
     createReponse,
     getReponse,
     getReponsesByStudent,
     getAssignments,
-    getCorrectionsByStudent,
     getAllCorrections,
+    generateCorrectionForReponse,
+    getCorrectionsForStudent,
+    updateCorrectionFeedback,
+    updateCorrectionScore
+
 };

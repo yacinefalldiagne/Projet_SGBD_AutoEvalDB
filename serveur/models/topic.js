@@ -10,6 +10,12 @@ const correctionSchema = new Schema({
         type: String,
         required: true,
     },
+    score: {
+        type: Number,
+        min: 0,
+        max: 20,
+        required: true,
+    },
 });
 
 const topicSchema = new Schema({

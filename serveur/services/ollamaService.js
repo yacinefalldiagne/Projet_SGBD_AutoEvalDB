@@ -5,16 +5,22 @@ const ollamaBaseUrl = 'http://localhost:11434';
 const generateCorrection = async (text, model) => {
     try {
         console.log(`Envoi de la requête à Ollama pour le modèle ${model}...`);
+        const prompt = `
+        Vous êtes un correcteur automatique de devoirs de SQL. Votre tâche est de corriger le texte suivant en proposant des améliorations. Fournissez une correction simple et claire. Structurez votre réponse comme suit, en utilisant exactement ces en-têtes et en respectant cet ordre :
+
+        [Numéro de la question]: [Réponse corrigée]        
+
+        Voici le texte à corriger :
+        "${text}"
+        `;
+
         const response = await axios.post(`${ollamaBaseUrl}/api/generate`, {
             model: model,
-            prompt: `Corrigez le texte suivant et fournissez une explication détaillée des corrections : \n\n${text}`,
-            stream: false // Désactive le streaming pour obtenir une réponse complète
+            prompt: prompt,
+            stream: false
         });
-        // console.log(`Réponse reçue pour le modèle ${model} :`, response.data);
-        return {
-            model: model,
-            correction: response.data.response,
-        };
+
+        return { model: model, correction: response.data.response };
     } catch (error) {
         console.error(`Erreur avec le modèle ${model} :`, error.message);
         if (error.response) {
@@ -28,10 +34,11 @@ const generateCorrectionStudent = async (submittedText, teacherCorrection, model
     try {
         console.log(`Envoi de la requête à Ollama pour le modèle ${model}...`);
         const prompt = `
-        Vous êtes un correcteur automatique de devoirs. Votre tâche est de corriger le texte soumis par un étudiant en le comparant à une correction modèle fournie par l'enseignant. Fournissez une correction détaillée des erreurs et attribuez une note sur 20 en fonction de la qualité de la réponse. Structurez votre réponse comme suit :
+        Vous êtes un correcteur automatique de devoirs de SQL. Votre tâche est de comparer les réponses soumises par l'étudiant avec la correction modèle fournie par l'enseignant, et de fournir une analyse. Structurez votre réponse comme suit, en utilisant exactement ces en-têtes et en respectant cet ordre :
 
-        **Correction détaillée** : [Votre correction détaillée ici, en expliquant les erreurs et en proposant des améliorations]
-        **Note** : [Une note sur 20, justifiée brièvement]
+        CORRECTION: [Une liste numérotée des réponses corrigées pour chaque question, avec une brève explication des erreurs si nécessaire]
+        NOTE: [Une note sur 20 basée sur la qualité des réponses de l'étudiant par rapport au modèle]
+        FEEDBACK: [Un feedback général sur les forces et faiblesses de l'étudiant, avec des suggestions d'amélioration]
 
         Voici le texte soumis par l'étudiant :
         "${submittedText}"
@@ -46,21 +53,22 @@ const generateCorrectionStudent = async (submittedText, teacherCorrection, model
             stream: false,
         });
 
-        const rawResponse = response.data.response;
+        const ollamaResponse = response.data.response;
 
-        // Extraire la correction détaillée et la note à l'aide d'une expression régulière
-        const correctionMatch = rawResponse.match(/\*\*Correction détaillée\*\* : ([\s\S]*?)\*\*Note\*\* : (\d+)/);
-        if (!correctionMatch) {
-            throw new Error('Réponse de l\'IA mal formatée.');
-        }
+        // Parser la réponse pour extraire la correction, la note et le feedback
+        const correctionMatch = ollamaResponse.match(/CORRECTION:(.*?)NOTE:/s);
+        const noteMatch = ollamaResponse.match(/NOTE:(.*?)FEEDBACK:/s);
+        const feedbackMatch = ollamaResponse.match(/FEEDBACK:(.*)$/s);
 
-        const correction = correctionMatch[1].trim();
-        const score = parseInt(correctionMatch[2], 10);
+        const correction = correctionMatch ? correctionMatch[1].trim() : ollamaResponse;
+        const score = noteMatch ? parseInt(noteMatch[1].trim(), 10) : 0;
+        const feedback = feedbackMatch ? feedbackMatch[1].trim() : "Aucun feedback fourni.";
 
         return {
             model: model,
             correction: correction,
             score: score,
+            feedback: feedback,
         };
     } catch (error) {
         console.error(`Erreur avec le modèle ${model} :`, error.message);
@@ -71,4 +79,4 @@ const generateCorrectionStudent = async (submittedText, teacherCorrection, model
     }
 };
 
-module.exports = { generateCorrection, generateCorrectionStudent }; // Exporter uniquement generateCorrection
+module.exports = { generateCorrection, generateCorrectionStudent };
