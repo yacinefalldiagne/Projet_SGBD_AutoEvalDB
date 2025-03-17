@@ -427,6 +427,9 @@ const getCorrectionsByStudent = async (req, res) => {
         res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
     }
 }
+
+//test
+
 module.exports = {
     createReponse,
     getReponse,
