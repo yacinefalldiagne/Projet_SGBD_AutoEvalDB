@@ -4,6 +4,7 @@ const cors = require("cors");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const { test, registerUser, loginUser, getProfile, logoutUser } = require("../controllers/authController");
+
 const { verifyToken, checkRole } = require("../middlewares/authMiddleware");
 
 // Middleware CORS
@@ -16,6 +17,11 @@ router.use(
 
 // Routes publiques
 router.get("/test", test); // Renommé pour éviter confusion avec la racine "/"
+// Routes classiques
+router.get("/", test);
+
+// Routes publiques
+
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
@@ -39,12 +45,20 @@ router.get(
     passport.authenticate("google", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
         const token = jwt.sign(
-            { email: req.user.email, id: req.user._id, name: req.user.name },
+            { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+        // Rediriger vers la page d'accueil du client
+        if (req.user.role === "enseignant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else if (req.user.role === "etudiant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`); // Par défaut
+        }
     }
 );
 
@@ -55,12 +69,20 @@ router.get(
     passport.authenticate("github", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
         const token = jwt.sign(
-            { email: req.user.email, id: req.user._id, name: req.user.name },
+            { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+        // Rediriger vers la page d'accueil du client
+        if (req.user.role === "enseignant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else if (req.user.role === "etudiant") {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
+        } else {
+            res.redirect(`${process.env.CLIENT_URL}/oauth-callback`); // Par défaut
+        }
     }
 );
 

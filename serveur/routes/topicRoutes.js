@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-const { createTopic } = require("../controllers/topicController");
-const { getTopic } = require("../controllers/topicController");
+const { getTopic, generateCorrectionsForTopic, createTopic, downloadCorrectionAsPDF, publishTopic, downloadFile } = require("../controllers/topicController");
 
 // middleware
 router.use(
@@ -14,5 +13,8 @@ router.use(
 
 router.post("/createTopic", createTopic)
 router.get("/getTopic", getTopic)
-
+router.post("/generateCorrections/:topicId", generateCorrectionsForTopic);
+router.get('/downloadCorrectionPDF/:topicId', downloadCorrectionAsPDF);
+router.post('/publishTopic/:topicId', publishTopic);
+router.get('/downloadFile/:topicId', downloadFile);
 module.exports = router

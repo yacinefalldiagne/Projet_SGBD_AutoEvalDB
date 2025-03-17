@@ -1,6 +1,23 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const correctionSchema = new Schema({
+    model: {
+        type: String,
+        required: true,
+    },
+    correction: {
+        type: String,
+        required: true,
+    },
+    score: {
+        type: Number,
+        min: 0,
+        max: 20,
+        required: true,
+    },
+});
+
 const topicSchema = new Schema({
     title: {
         type: String,
@@ -21,9 +38,13 @@ const topicSchema = new Schema({
     file: {
         type: String,
     },
-    correction: String,
+    status: {
+        type: String,
+        enum: ['brouillon', 'public'],
+        default: 'brouillon', // Par défaut
+    },
+    corrections: [correctionSchema],
 }, { timestamps: true });
 
 const topicModel = mongoose.model('Topic', topicSchema);
 module.exports = topicModel;
-

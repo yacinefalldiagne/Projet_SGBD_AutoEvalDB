@@ -1,4 +1,4 @@
-import { CloudCog, BookOpen, ChartColumn, NotepadText, Edit, Home, Settings, SpellCheck, FileText, Send, LogOut } from "lucide-react";
+import { CloudCog, BookOpen, ChartColumn, NotepadText, Edit, Home, Settings, SpellCheck, FileText, Send, LogOut, Package } from "lucide-react";
 
 
 import ProfileImage from "@/assets/profile-image.jpg";
@@ -36,25 +36,30 @@ export const navbarLinksProf = [
                 path: "/enseignant/statistique",
             },
             {
-                label: "Dépôt de Sujet",
+                label: "Dépôt de sujet",
                 icon: NotepadText,
                 path: "/enseignant/exercices",
             },
             {
-                label: "Correction",
+                label: "Liste des devoirs",
+                icon: Package,
+                path: "/enseignant/devoirs",
+            },
+            {
+                label: "Modèle de correction",
                 icon: Edit,
                 path: "/enseignant/correction",
+            },
+            {
+                label: "Gestion des notes",
+                icon: CloudCog,
+                path: "/enseignant/ajustements",
             },
         ],
     },
     {
         title: "Intelligent",
         links: [
-            {
-                label: "Correction",
-                icon: CloudCog,
-                path: "/enseignant/intelligent/correctionAutomatique",
-            },
             {
                 label: "Apprentissage",
                 icon: BookOpen,

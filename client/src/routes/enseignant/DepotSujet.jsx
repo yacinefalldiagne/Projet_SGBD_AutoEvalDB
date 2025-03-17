@@ -194,7 +194,7 @@ const FileManager = () => {
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <Label htmlFor="model-upload" className="block text-lg font-semibold text-gray-700 mb-2">
               Ajouter un modèle de correction :
             </Label>
@@ -212,11 +212,11 @@ const FileManager = () => {
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
 
           <Button
             type="submit"
-            className="mt-4 bg-blue-500 text-white hover:bg-blue-600"
+            className="mt-12 bg-blue-500 text-white hover:bg-blue-600"
             disabled={loading}
           >
             {loading ? "Envoi en cours..." : "Soumettre le Sujet"}
@@ -224,7 +224,7 @@ const FileManager = () => {
         </form>
 
         {/* Affichage des sujets */}
-        <div>
+        {/* <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">Sujets :</h3>
           {subjects.length === 0 ? (
             <p className="text-gray-500 text-sm">Aucun sujet ajouté pour le moment.</p>
@@ -252,10 +252,10 @@ const FileManager = () => {
               ))}
             </AnimatePresence>
           )}
-        </div>
+        </div> */}
 
         {/* Affichage des modèles */}
-        <div>
+        {/* <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">Modèles de correction :</h3>
           {corrections.length === 0 ? (
             <p className="text-gray-500 text-sm">Aucun modèle ajouté pour le moment.</p>
@@ -283,7 +283,7 @@ const FileManager = () => {
               ))}
             </AnimatePresence>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

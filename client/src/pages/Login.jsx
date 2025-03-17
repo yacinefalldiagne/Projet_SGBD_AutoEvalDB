@@ -63,7 +63,7 @@ export function Login() {
                     <ArrowLeft />
                 </Link>
                 <div className="text-center">
-                    <h2 className="font-bold mb-4 text-2xl">Se connecter</h2>
+                    <h2 className="font-bold mb-4 text-2xl">Connexion</h2>
                     <p className="text-lg font-normal text-blue-gray-500">Saisir votre email et mot de passe pour vous connecter.</p>
                 </div>
                 <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2" onSubmit={loginUser}>
@@ -74,7 +74,7 @@ export function Login() {
                         <input
                             type="email"
                             placeholder="name@mail.com"
-                            className="border-t-blue-gray-200 focus:border-t-gray-900 p-2 rounded-lg"
+                            className="border border-gray-500 focus:border-t-gray-900 p-2 rounded-lg"
                             value={data.email}
                             onChange={(e) => setData({ ...data, email: e.target.value })}
                         />
@@ -84,7 +84,7 @@ export function Login() {
                         <input
                             type="password"
                             placeholder="********"
-                            className="border-t-blue-gray-200 focus:border-t-gray-900 p-2 rounded-lg"
+                            className="border border-gray-500 focus:border-t-gray-900 p-2 rounded-lg"
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
                         />
@@ -105,8 +105,8 @@ export function Login() {
                         </a>
                     </div>
                     <div className="space-y-4 mt-8">
-                        <button 
-                            type="button" 
+                        <button
+                            type="button"
                             onClick={handleGoogleLogin}
                             className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
                         >
@@ -125,7 +125,7 @@ export function Login() {
                             </svg>
                             <span>Se connecter avec Google</span>
                         </button>
-                        <button 
+                        <button
                             type="button"
                             onClick={handleGithubLogin}
                             className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
@@ -133,16 +133,16 @@ export function Login() {
                             <img src={github} height={24} width={24} alt="GitHub Logo" />
                             <span>Se connecter avec GitHub</span>
                         </button>
-                        <button 
+                        <button
                             type="button"
                             onClick={handleMicrosoftLogin}
                             className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10 1H1V10H10V1Z" fill="#F25022"/>
-                                <path d="M20 1H11V10H20V1Z" fill="#7FBA00"/>
-                                <path d="M10 11H1V20H10V11Z" fill="#00A4EF"/>
-                                <path d="M20 11H11V20H20V11Z" fill="#FFB900"/>
+                                <path d="M10 1H1V10H10V1Z" fill="#F25022" />
+                                <path d="M20 1H11V10H20V1Z" fill="#7FBA00" />
+                                <path d="M10 11H1V20H10V11Z" fill="#00A4EF" />
+                                <path d="M20 11H11V20H20V11Z" fill="#FFB900" />
                             </svg>
                             <span>Se connecter avec Microsoft</span>
                         </button>

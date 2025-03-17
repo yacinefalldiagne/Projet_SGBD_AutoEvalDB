@@ -11,6 +11,7 @@ import Logout from "./pages/Logout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import OAuthCallback from "./pages/OAuthCallback";
 
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "@/contexts/user-context";
@@ -24,6 +25,7 @@ import IntelligentLayout from "@/routes/intelligent/Layout";
 import DepotSujet from "@/routes/enseignant/DepotSujet";
 import GestionModelesCorrection from "@/routes/enseignant/GestionModelesCorrection";
 import Statistique from "@/routes/enseignant/Statistique";
+import DevoirEtudiant from "@/routes/enseignant/DevoirEtudiant";
 
 
 function App() {
@@ -35,6 +37,10 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/oauth-callback",
+      element: < OAuthCallback />
     },
     {
       path: "/register",
@@ -58,12 +64,12 @@ function App() {
             { path: "exercices", element: <DepotSujet /> },
             { path: "correction", element: < GestionModelesCorrection /> },
             { path: "settings", element: <SettingsPage /> },
-
+            { path: "devoirs", element: <DevoirEtudiant /> },
+            { path: "ajustements", element: <CorrectionAuto /> },
             {
               path: "Intelligent",
               element: <IntelligentLayout />,
               children: [
-                { path: "correctionAutomatique", element: <CorrectionAuto /> },
                 { path: "apprentissage", element: <ApprentissageAuto /> },
               ],
             },
@@ -83,6 +89,8 @@ function App() {
             { path: "sujets", element: <StudentAssignmentsPage /> },
             { path: "soumettre", element: <StudentSubmitResponsePage /> },
             { path: "correction", element: <StudentViewCorrectionsPage /> },
+            { path: "settings", element: <SettingsPage /> },
+
           ],
         },
       ],
