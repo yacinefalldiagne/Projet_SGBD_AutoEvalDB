@@ -1,175 +1,251 @@
-// client/src/routes/settings/SettingsPage.jsx
 import { useState, useEffect } from "react";
-import Switch from "@/components/ui/Switch";
-import Button from "@/components/ui/Button";
+import { Footer } from "@/layouts/footer";
+import { useTheme } from "@/hooks/use-theme";
+import { Check, Lock, Mail, User, LogOut, Bell } from "lucide-react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
-function SettingsPage() {
-    const [darkMode, setDarkMode] = useState(false);
-    const [notifications, setNotifications] = useState(true);
-    const [language, setLanguage] = useState("fr");
+const SettingsPage = () => {
+    const { theme } = useTheme();
+    const [userData, setUserData] = useState({
+        name: "",
+        email: "",
+        notificationsEnabled: false,
+    });
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
     useEffect(() => {
-        const loadUserData = async () => {
+        const fetchUserData = async () => {
             try {
-                const response = await axios.get(`"http://localhost:8000/profile"`, { withCredentials: true });
-                const user = response.data;
-                setName(user.name);
-                setDarkMode(user.preferences.darkMode);
-                setNotifications(user.preferences.notifications);
-                setLanguage(user.preferences.language);
-                setMustResetPassword(user.mustResetPassword);
-            } catch (error) {
-                toast.error("Erreur lors du chargement des données");
+                setLoading(true);
+                const response = await axios.get("http://localhost:5000/api/student/profile", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                });
+                setUserData({
+                    name: response.data.name,
+                    email: response.data.email,
+                    notificationsEnabled: response.data.notificationsEnabled || false,
+                });
+                setError(null);
+            } catch (err) {
+                console.error("Erreur lors du chargement des données:", err);
+                setError(`Erreur : ${err.response?.data?.message || err.message}`);
+            } finally {
+                setLoading(false);
             }
         };
-        loadUserData();
-    }, "http://localhost:8000/profile");
+        fetchUserData();
+    }, []);
 
-
-    const handleUpdatePersonalInfo = async () => {
+    const handleProfileUpdate = async (e) => {
+        e.preventDefault();
         try {
-            const formData = new FormData();
-            formData.append("name", name);
-
-            const response = await axios.put(`${apiUrl}/update-personal-info`, formData, {
-                withCredentials: true,
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            toast.success(response.data.message);
-        } catch (error) {
-            toast.error("Erreur lors de la mise à jour");
-        }
-    };
-
-    const handleUpdatePreferences = async () => {
-        try {
+            setLoading(true);
             const response = await axios.put(
-                `${apiUrl}/update-preferences`,
-                { darkMode, notifications, language },
-                { withCredentials: true }
+                "http://localhost:5000/api/student/profile",
+                { name: userData.name, email: userData.email, notificationsEnabled: userData.notificationsEnabled },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
-            toast.success(response.data.message);
-        } catch (error) {
-            console.error("Erreur dans handleUpdatePreferences:", error.response?.data || error.message);
-            toast.error("Erreur lors de la mise à jour des préférences");
+            setUserData(response.data);
+            setSuccess("Profil mis à jour avec succès !");
+            setError(null);
+        } catch (err) {
+            console.error("Erreur lors de la mise à jour:", err);
+            setError(`Erreur : ${err.response?.data?.message || err.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleChangePassword = async () => {
-        const currentPassword = mustResetPassword ? "" : prompt("Mot de passe actuel");
-        const newPassword = prompt("Nouveau mot de passe");
-        if (!newPassword) return;
-
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setError("Les nouveaux mots de passe ne correspondent pas.");
+            return;
+        }
         try {
-            const response = await axios.put(
-                `${apiUrl}/change-password`,
-                { currentPassword, newPassword },
-                { withCredentials: true }
+            setLoading(true);
+            await axios.put(
+                "http://localhost:5000/api/student/password",
+                {
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword,
+                },
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
-            toast.success(response.data.message);
-            setMustResetPassword(false);
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Erreur lors du changement");
+            setSuccess("Mot de passe changé avec succès !");
+            setError(null);
+            setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        } catch (err) {
+            console.error("Erreur lors du changement de mot de passe:", err);
+            setError(`Erreur : ${err.response?.data?.message || err.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleDeleteAccount = async () => {
-        if (!window.confirm("Confirmer la suppression du compte ?")) return;
-        try {
-            const response = await axios.delete(`${apiUrl}/delete-account`, { withCredentials: true });
-            toast.success(response.data.message);
-            navigate("/login");
-        } catch (error) {
-            toast.error("Erreur lors de la suppression");
-        }
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
     };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUserData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handlePasswordInputChange = (e) => {
+        const { name, value } = e.target;
+        setPasswordData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p className="text-xl text-slate-900 dark:text-slate-50">Chargement...</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Paramètres</h1>
+        <div className="flex flex-col gap-y-4 p-6">
+            <h1 className="title text-2xl font-bold text-slate-900 dark:text-slate-50">Paramètres</h1>
 
-                {/* Informations personnelles */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Profil</h2>
+            {error && (
+                <div className="card bg-red-500/20 text-red-500 p-4 rounded-lg">
+                    <p>{error}</p>
+                </div>
+            )}
+            {success && (
+                <div className="card bg-green-500/20 text-green-500 p-4 rounded-lg flex items-center gap-x-2">
+                    <Check size={20} />
+                    <p>{success}</p>
+                </div>
+            )}
 
-                    <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom</label>
+            <div className="card">
+                <div className="card-header flex items-center gap-x-4">
+                    <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">
+                        <User size={26} />
+                    </div>
+                    <p className="card-title text-lg font-semibold text-slate-900 dark:text-slate-50">
+                        Informations Personnelles
+                    </p>
+                </div>
+                <form onSubmit={handleProfileUpdate} className="card-body bg-slate-100 dark:bg-slate-950 p-4 flex flex-col gap-y-4">
+                    <div className="flex items-center gap-x-4">
                         <input
                             type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring focus:ring-blue-300"
+                            name="name"
+                            value={userData.name}
+                            onChange={handleInputChange}
+                            placeholder="Votre nom"
+                            className="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
-                    <Button onClick={handleUpdatePersonalInfo} className="mt-4 bg-green-500 hover:bg-green-600 text-white">
-                        Mettre à jour
-                    </Button>
-                </section>
-
-                {/* Préférences */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Préférences</h2>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                            <span className="text-gray-700 dark:text-gray-300">Mode sombre</span>
-                            <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                            <span className="text-gray-700 dark:text-gray-300">Notifications</span>
-                            <Switch checked={notifications} onCheckedChange={setNotifications} />
-                        </div>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                            <label className="block text-gray-700 dark:text-gray-300">Langue</label>
-                            <select
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                                className="mt-1 w-full p-2 border rounded-md dark:bg-gray-600 dark:text-white dark:border-gray-500"
-                            >
-                                <option value="fr">Français</option>
-                                <option value="en">Anglais</option>
-                            </select>
-                        </div>
+                    <div className="flex items-center gap-x-4">
+                        <input
+                            type="email"
+                            name="email"
+                            value={userData.email}
+                            onChange={handleInputChange}
+                            placeholder="Votre email"
+                            className="flex-1 p-2 rounded-lg bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                     </div>
-                    <Button onClick={handleUpdatePreferences} className="mt-4 bg-green-500 hover:bg-green-600 text-white">
-                        Enregistrer
-                    </Button>
-                </section>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
+                    >
+                        Sauvegarder
+                    </button>
+                </form>
+            </div>
 
-                {/* Sécurité */}
-                <section className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Sécurité</h2>
-
-                    <p className="text-red-500 mb-4 font-medium">Vous devez définir un mot de passe.</p>
-
-                    <Button onClick={handleChangePassword} className="bg-red-500 hover:bg-red-600 text-white">
-                        {/* {mustResetPassword ? "Définir un mot de passe" : "Changer le mot de passe"} */}
-                    </Button>
-                </section>
-
-                {/* Actions */}
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
-                    <h2 className="text-lg font-semibold mb-3">Actions du compte</h2>
-                    <Button className="bg-red-500 hover:bg-red-600 text-white mt-3">Supprimer le compte</Button>
-                    {/* Actions */}
-                    <section>
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Actions</h2>
-                        <div className="flex space-x-4">
-                            {/* <Button onClick={handleLogout} className="bg-gray-600 hover:bg-gray-700 text-white">
-                                Déconnexion
-                            </Button> */}
-                            <Button onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white">
-                                Supprimer le compte
-                            </Button>
-                        </div>
-                    </section>
+            <div className="card">
+                <div className="card-header flex items-center gap-x-4">
+                    <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">
+                        <Bell size={26} />
+                    </div>
+                    <p className="card-title text-lg font-semibold text-slate-900 dark:text-slate-50">
+                        Préférences
+                    </p>
+                </div>
+                <div className="card-body bg-slate-100 dark:bg-slate-950 p-4 flex flex-col gap-y-4">
+                    <div className="flex items-center justify-between">
+                        <p className="text-slate-900 dark:text-slate-50">Notifications</p>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={userData.notificationsEnabled}
+                                onChange={() =>
+                                    setUserData((prev) => ({
+                                        ...prev,
+                                        notificationsEnabled: !prev.notificationsEnabled,
+                                    }))
+                                }
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                        </label>
+                    </div>
                 </div>
             </div>
+
+            <div className="card">
+                <div className="card-header flex items-center gap-x-4">
+                    <div className="w-fit rounded-lg bg-blue-500/20 p-2 text-blue-500 transition-colors dark:bg-blue-600/20 dark:text-blue-600">
+                        <Lock size={26} />
+                    </div>
+                    <p className="card-title text-lg font-semibold text-slate-900 dark:text-slate-50">
+                        Changer le Mot de Passe
+                    </p>
+                </div>
+                <form onSubmit={handlePasswordChange} className="card-body bg-slate-100 dark:bg-slate-950 p-4 flex flex-col gap-y-4">
+                    <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordInputChange}
+                        placeholder="Mot de passe actuel"
+                        className="p-2 rounded-lg bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordInputChange}
+                        placeholder="Nouveau mot de passe"
+                        className="p-2 rounded-lg bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordInputChange}
+                        placeholder="Confirmer le nouveau mot de passe"
+                        className="p-2 rounded-lg bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-fit px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 transition-colors"
+                    >
+                        Changer le mot de passe
+                    </button>
+                </form>
+            </div>
+
+            <Footer />
         </div>
     );
-}
+};
 
 export default SettingsPage;
