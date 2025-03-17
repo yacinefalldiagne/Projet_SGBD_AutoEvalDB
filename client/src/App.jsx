@@ -11,6 +11,7 @@ import Logout from "./pages/Logout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import OAuthCallback from "./pages/OAuthCallback";
 
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "@/contexts/user-context";
@@ -38,6 +39,10 @@ function App() {
       element: <Login />,
     },
     {
+      path: "/oauth-callback",
+      element: < OAuthCallback />
+    },
+    {
       path: "/register",
       element: <Register />,
     },
@@ -60,12 +65,11 @@ function App() {
             { path: "correction", element: < GestionModelesCorrection /> },
             { path: "settings", element: <SettingsPage /> },
             { path: "devoirs", element: <DevoirEtudiant /> },
-
+            { path: "ajustements", element: <CorrectionAuto /> },
             {
               path: "Intelligent",
               element: <IntelligentLayout />,
               children: [
-                { path: "correctionAutomatique", element: <CorrectionAuto /> },
                 { path: "apprentissage", element: <ApprentissageAuto /> },
               ],
             },
@@ -86,6 +90,7 @@ function App() {
             { path: "soumettre", element: <StudentSubmitResponsePage /> },
             { path: "correction", element: <StudentViewCorrectionsPage /> },
             { path: "settings", element: <SettingsPage /> },
+
           ],
         },
       ],

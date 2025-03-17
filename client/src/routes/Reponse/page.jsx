@@ -74,16 +74,15 @@ const StudentSubmitResponsePage = () => {
         setMessage("Réponse soumise avec succès !");
         setFormData({ assignmentId: '', file: null });
       } else {
-        setMessage("Erreur lors de la soumission.");
+        setMessage("Erreur lors de la soumission. Veuillez réessayer.");
       }
     } catch (err) {
       console.error("Erreur serveur:", err.response ? err.response.data : err.message);
-      setMessage("Erreur serveur : " + (err.response?.data?.message || err.message));
+      setMessage("Erreur serveur. Veuillez réessayer plus tard."); // Message générique pour l'utilisateur
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-lg border border-gray-200">

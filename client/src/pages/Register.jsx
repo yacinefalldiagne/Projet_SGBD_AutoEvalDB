@@ -74,7 +74,7 @@ export default function Register() {
                         <input
                             type="text"
                             placeholder="John Doe"
-                            className="border-t-blue-gray-200 focus:border-t-gray-900 p-2 rounded-lg"
+                            className="border border-gray-500 focus:border-t-gray-900 p-2 rounded-lg"
                             value={data.name}
                             onChange={(e) => setData({ ...data, name: e.target.value })}
                         />
@@ -84,7 +84,7 @@ export default function Register() {
                         <input
                             type="email"
                             placeholder="name@mail.com"
-                            className="border-t-blue-gray-200 focus:border-t-gray-900 p-2 rounded-lg"
+                            className="border border-gray-500 focus:border-t-gray-900 p-2 rounded-lg"
                             value={data.email}
                             onChange={(e) => setData({ ...data, email: e.target.value })}
                         />
@@ -94,22 +94,25 @@ export default function Register() {
                         <input
                             type="password"
                             placeholder="********"
-                            className="border-t-blue-gray-200 focus:border-t-gray-900 p-2 rounded-lg"
+                            className="border border-gray-500 focus:border-t-gray-900 p-2 rounded-lg"
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
                         />
                     </div>
-                    <div className="flex items-center">
-                        <label htmlFor="terms" className="flex items-center font-medium text-gray-700">
-                            <input type="checkbox" id="terms" />
-                            J'accepte&nbsp;
-                            <a
-                                href="#"
-                                className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                            >
-                                Les conditions d'utilisation
-                            </a>
-                        </label>
+                    <div className="flex items-center justify-between gap-2 mt-6">
+                        <div className="flex items-center">
+
+                            <label htmlFor="terms" className="flex items-center font-medium text-gray-700">
+                                <input type="checkbox" id="terms" className="w-6 h-6 -ml-2.5" />
+                                J'accepte&nbsp;
+                                <a
+                                    href="#"
+                                    className="font-normal text-black transition-colors hover:text-gray-900 underline"
+                                >
+                                    Les conditions d'utilisation
+                                </a>
+                            </label>
+                        </div>
                     </div>
                     <button className="mt-6 w-full bg-sky-800 text-white p-2 rounded-lg" type="submit" >
                         S'inscrire

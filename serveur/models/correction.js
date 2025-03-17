@@ -3,17 +3,17 @@ const { Schema } = mongoose;
 
 const correctionSchema = new Schema({
     reponse: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Reponse',
         required: true,
     },
     topic: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Topic',
         required: true,
     },
     student: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
@@ -33,9 +33,10 @@ const correctionSchema = new Schema({
         type: Number,
         min: 0,
         max: 20,
-        required: true,
+    },
+    feedback: {
+        type: String,
     },
 }, { timestamps: true });
 
-const correctionModel = mongoose.model('Correction', correctionSchema);
-module.exports = correctionModel;
+module.exports = mongoose.model('Correction', correctionSchema);
