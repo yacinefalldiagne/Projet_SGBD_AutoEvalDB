@@ -1,3 +1,4 @@
+// SettingsPage.js
 import { useState, useEffect } from "react";
 import { Footer } from "@/layouts/footer";
 import { useTheme } from "@/hooks/use-theme";
@@ -24,13 +25,13 @@ const SettingsPage = () => {
         const fetchUserData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:5000/api/student/profile", {
+                const response = await axios.get("http://localhost:8000/api/student/profile", {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
                 setUserData({
                     name: response.data.name,
                     email: response.data.email,
-                    notificationsEnabled: response.data.notificationsEnabled || false,
+                    notificationsEnabled: response.data.notificationsEnabled, // Mappé à preferences.notifications
                 });
                 setError(null);
             } catch (err) {
@@ -48,11 +49,19 @@ const SettingsPage = () => {
         try {
             setLoading(true);
             const response = await axios.put(
-                "http://localhost:5000/api/student/profile",
-                { name: userData.name, email: userData.email, notificationsEnabled: userData.notificationsEnabled },
+                "http://localhost:8000/api/student/profile",
+                {
+                    name: userData.name,
+                    email: userData.email,
+                    notificationsEnabled: userData.notificationsEnabled, // Mappé à preferences.notifications
+                },
                 { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
-            setUserData(response.data);
+            setUserData({
+                name: response.data.name,
+                email: response.data.email,
+                notificationsEnabled: response.data.notificationsEnabled,
+            });
             setSuccess("Profil mis à jour avec succès !");
             setError(null);
         } catch (err) {
@@ -72,7 +81,7 @@ const SettingsPage = () => {
         try {
             setLoading(true);
             await axios.put(
-                "http://localhost:5000/api/student/password",
+                "http://localhost:8000/api/student/password",
                 {
                     currentPassword: passwordData.currentPassword,
                     newPassword: passwordData.newPassword,
@@ -92,7 +101,7 @@ const SettingsPage = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        window.location.href = "/login"; 
+        window.location.href = "/login";
     };
 
     const handleInputChange = (e) => {

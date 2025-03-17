@@ -1,43 +1,19 @@
 // routes/settingsRoutes.js
 const express = require("express");
 const router = express.Router();
-const cors = require("cors");
-const { verifyToken } = require("../middlewares/authMiddleware");
-const {
-    getUserData,
-    updatePersonalInfo,
-    updatePreferences,
-    changePassword,
-    deleteAccount,
-} = require("../controllers/settingsController");
-const multer = require("multer");
-const path = require("path");
+const passport = require("passport");
+const settingsController = require("../controllers/settingsController");
 
-// Middleware CORS
-router.use(
-    cors({
-        origin: process.env.CLIENT_URL,
-        credentials: true,
-    })
-);
+// Middleware pour protéger les routes (authentification JWT)
+const authMiddleware = passport.authenticate("jwt", { session: false });
 
-// Configuration de Multer pour le téléchargement de fichiers
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/profile-images");
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
-    },
-});
+// Route pour récupérer les données du profil
+router.get("/api/student/profile", authMiddleware, settingsController.getProfile);
 
-const upload = multer({ storage });
+// Route pour mettre à jour les données du profil
+router.put("/api/student/profile", authMiddleware, settingsController.updateProfile);
 
-// Routes protégées
-router.get("/user", verifyToken, getUserData); // Obtenir les données de l'utilisateur
-router.put("/update-personal-info", verifyToken, upload.single("profileImage"), updatePersonalInfo);
-router.put("/update-preferences", verifyToken, updatePreferences);
-router.put("/change-password", verifyToken, changePassword);
-router.delete("/delete-account", verifyToken, deleteAccount);
+// Route pour changer le mot de passe
+router.put("/api/student/password", authMiddleware, settingsController.changePassword);
 
 module.exports = router;
