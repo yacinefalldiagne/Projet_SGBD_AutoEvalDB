@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const session = require("express-session");
-const path = require('path');
 
 const app = express();
 
@@ -15,14 +14,13 @@ mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 5000, // Ajouter un timeout plus court pour la sélection du serveur
+        serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
     })
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("DB not connected", err));
 
-
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 5000;
 
 app.use(
     cors({
@@ -42,7 +40,7 @@ app.use(
         secret: process.env.SESSION_SECRET || "your_session_secret",
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: process.env.NODE_ENV === "production" }
+        cookie: { secure: process.env.NODE_ENV === "production" },
     })
 );
 
@@ -58,10 +56,6 @@ app.use("/", require("./routes/authRoutes"));
 app.use("/", require("./routes/submissionRoutes"));
 app.use("/", require("./routes/topicRoutes"));
 app.use("/", require("./routes/settingsRoutes"));
-
-// Dossier des fichiers statiques
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/uploads/profile-images', express.static(path.join(__dirname, 'uploads/profile-images')));
 
 // Lancement du serveur
 app.listen(port, () => {

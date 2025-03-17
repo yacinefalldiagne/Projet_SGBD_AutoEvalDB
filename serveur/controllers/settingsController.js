@@ -1,71 +1,79 @@
 // controllers/settingsController.js
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
-const fs = require("fs");
-const path = require("path");
+const jwt = require('jsonwebtoken');
 
-// Obtenir les données de l'utilisateur
-exports.getUserData = async (req, res) => {
+// Récupérer les données du profil
+exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("-password"); // Exclure le mot de passe
+        const { token } = req.cookies;
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const userId = decoded.id;
+                const user = await User.findById(userId).select("-password");
+        // req.user est défini par le middleware passport.authenticate("jwt")
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
-        return res.status(200).json(user);
+        // Mapper preferences.notifications à notificationsEnabled pour le frontend
+        const userData = {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            notificationsEnabled: user.preferences.notifications,
+            darkMode: user.preferences.darkMode,
+            language: user.preferences.language,
+        };
+        res.json(userData);
     } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Erreur serveur" });
     }
 };
 
-// Mettre à jour les informations personnelles (nom, photo de profil)
-exports.updatePersonalInfo = async (req, res) => {
+// Mettre à jour les données du profil
+exports.updateProfile = async (req, res) => {
     try {
-        const { name } = req.body; // Utiliser "name" au lieu de "firstName" et "lastName"
-        const user = await User.findById(req.user.id);
+        const { name, email, notificationsEnabled } = req.body;
 
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé" });
-        }
-
-        user.name = name || user.name;
-
-        // Gestion de la photo de profil
-        if (req.file) {
-            // Supprimer l'ancienne photo si elle existe et n'est pas celle par défaut
-            if (user.profilePicture && user.profilePicture !== "default-avatar.png") {
-                const oldImagePath = path.join(__dirname, "..", "uploads", "profile-images", user.profilePicture);
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
+        // Vérifier si l'email est déjà utilisé par un autre utilisateur
+        if (email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser && existingUser._id.toString() !== req.user.id) {
+                return res.status(400).json({ message: "Cet email est déjà utilisé" });
             }
-            user.profilePicture = req.file.filename;
         }
 
-        await user.save();
-        return res.status(200).json({ message: "Informations personnelles mises à jour", user });
-    } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
-    }
-};
+        // Préparer les données à mettre à jour
+        const updateData = { name, email };
+        if (typeof notificationsEnabled !== "undefined") {
+            updateData["preferences.notifications"] = notificationsEnabled;
+        }
 
-// Mettre à jour les préférences (mode sombre, notifications, langue)
-exports.updatePreferences = async (req, res) => {
-    try {
-        const { darkMode, notifications, language } = req.body;
-        const user = await User.findById(req.user.id);
+        // Mettre à jour l'utilisateur
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select("-password");
 
-        if (!user) {
+        if (!updatedUser) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        user.preferences.darkMode = darkMode !== undefined ? darkMode : user.preferences.darkMode;
-        user.preferences.notifications = notifications !== undefined ? notifications : user.preferences.notifications;
-        user.preferences.language = language || user.preferences.language;
+        // Mapper les données pour le frontend
+        const userData = {
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            notificationsEnabled: updatedUser.preferences.notifications,
+            darkMode: updatedUser.preferences.darkMode,
+            language: updatedUser.preferences.language,
+        };
 
-        await user.save();
-        return res.status(200).json({ message: "Préférences mises à jour", preferences: user.preferences });
+        res.json(userData);
     } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Erreur serveur" });
     }
 };
 
@@ -73,18 +81,22 @@ exports.updatePreferences = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
-        const user = await User.findById(req.user.id);
 
+        // Récupérer l'utilisateur via req.user (fourni par Passport)
+        const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        // Vérifier si l'utilisateur a un mot de passe (non-OAuth)
+        // Vérifier si l'utilisateur a un mot de passe local (non-OAuth)
         if (!user.password) {
-            return res.status(400).json({ message: "Impossible de changer le mot de passe pour les comptes OAuth" });
+            return res.status(400).json({
+                message:
+                    "Impossible de changer le mot de passe. Ce compte est lié à un fournisseur OAuth (Google, GitHub, Microsoft).",
+            });
         }
 
-        // Vérifier l'ancien mot de passe
+        // Vérifier le mot de passe actuel
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
             return res.status(400).json({ message: "Mot de passe actuel incorrect" });
@@ -94,34 +106,9 @@ exports.changePassword = async (req, res) => {
         user.password = newPassword;
         await user.save();
 
-        return res.status(200).json({ message: "Mot de passe mis à jour avec succès" });
+        res.json({ message: "Mot de passe mis à jour avec succès" });
     } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
-    }
-};
-
-// Supprimer le compte
-exports.deleteAccount = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur non trouvé" });
-        }
-
-        // Supprimer la photo de profil si elle existe et n'est pas celle par défaut
-        if (user.profilePicture && user.profilePicture !== "default-avatar.png") {
-            const imagePath = path.join(__dirname, "..", "uploads", "profile-images", user.profilePicture);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
-        }
-
-        await user.deleteOne();
-        // Supprimer le cookie JWT
-        res.clearCookie("token");
-        return res.status(200).json({ message: "Compte supprimé avec succès" });
-    } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Erreur serveur" });
     }
 };
