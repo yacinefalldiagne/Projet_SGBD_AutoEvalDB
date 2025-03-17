@@ -1,4 +1,4 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts"; // Changement ici
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { useTheme } from "@/hooks/use-theme";
 import { Footer } from "@/layouts/footer";
 import { CreditCard, PencilLine, Star, Trash, TrendingUp, Users } from "lucide-react";
@@ -18,19 +18,21 @@ const DashboardPage = () => {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
+    const BASE_URL = "http://localhost:8000";
+
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:5000/api/student/dashboard", {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+                const response = await axios.get(`${BASE_URL}/dashboard`, {
+                    withCredentials: true, // Envoie le cookie JWT
                 });
                 setStudentData(response.data);
                 setLastUpdated(new Date().toLocaleTimeString());
                 setError(null);
             } catch (err) {
                 console.error("Erreur lors du chargement des données:", err);
-                setError("Impossible de charger les données. Veuillez réessayer plus tard.");
+                setError(err.response ? err.response.data.message : "Impossible de charger les données. Veuillez réessayer plus tard.");
             } finally {
                 setLoading(false);
             }

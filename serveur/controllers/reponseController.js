@@ -408,25 +408,144 @@ const updateCorrectionFeedback = async (req, res) => {
     }
 };
 
+const getDashboard = async (req, res) => {
+    try {
+        // Vérifier l'authentification via JWT
+        const { token } = req.cookies;
+        if (!token) {
+            return res.status(401).json({ message: "Vous devez être connecté pour accéder au tableau de bord." });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: "Token invalide ou expiré." });
+        }
+
+        const userId = decoded.id; // Ou decoded.userId selon ton payload JWT
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+
+        // Récupérer les réponses de l'étudiant
+        const reponses = await Reponse.find({ student: userId })
+            .populate('title', 'title description');
+
+        // Récupérer les corrections associées à ces réponses
+        const corrections = await Correction.find({ student: userId })
+            .populate('reponse', 'file createdAt')
+            .populate('topic', 'title');
+
+        // Calculer la moyenne de l'étudiant
+        const totalScore = corrections.reduce((sum, corr) => sum + (corr.score || 0), 0);
+        const averageGrade = corrections.length > 0 ? totalScore / corrections.length : 0;
+
+        // Formater les soumissions pour le frontend
+        const submissions = corrections.map((correction) => ({
+            id: correction._id.toString(),
+            exerciseName: correction.topic?.title || "Sans titre",
+            date: correction.createdAt,
+            grade: correction.score || 0,
+            feedback: correction.feedback || "Aucun feedback",
+        }));
+
+        // Données pour la progression (par date)
+        const progression = corrections.map((correction) => ({
+            date: new Date(correction.createdAt).toLocaleDateString(),
+            grade: correction.score || 0,
+            classAverage: null, // Calculé ci-dessous
+        }));
+
+        // Calculer la moyenne de la classe (toutes les corrections)
+        const allCorrections = await Correction.find()
+            .populate('student', 'role')
+            .lean();
+        const studentCorrections = allCorrections.filter(corr => {
+            const student = corr.student;
+            return student && student.role === 'etudiant';
+        });
+        const classTotalScore = studentCorrections.reduce((sum, corr) => sum + (corr.score || 0), 0);
+        const classAverage = studentCorrections.length > 0 ? classTotalScore / studentCorrections.length : 0;
+
+        // Ajouter la moyenne de la classe à la progression
+        progression.forEach((item) => {
+            item.classAverage = classAverage;
+        });
+
+        // Réponse finale
+        const dashboardData = {
+            name: user.name || "Étudiant",
+            averageGrade,
+            submissions,
+            progression,
+            classAverage,
+        };
+
+        res.status(200).json(dashboardData);
+    } catch (error) {
+        console.error("Erreur dans getDashboard:", error);
+        res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
+    }
+};
+
 const getCorrectionsByStudent = async (req, res) => {
     try {
-        // Vérifier l’authentification
-        if (!req.isAuthenticated()) {
+        // Vérifier l'authentification via JWT (comme dans ton setup)
+        const { token } = req.cookies;
+        if (!token) {
             return res.status(401).json({ message: "Vous devez être connecté pour consulter vos corrections." });
         }
 
-        const userId = req.user._id.toString(); // ID de l’utilisateur connecté
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: "Token invalide ou expiré." });
+        }
 
-        // Récupérer les corrections
+        const userId = decoded.id; // Ou decoded.userId selon ton JWT payload
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé." });
+        }
+
+        // Récupérer les corrections pour l'étudiant connecté
         const corrections = await Correction.find({ student: userId })
-            .populate('reponse', 'file createdAt')
-            .populate('topic', 'title')
+            .populate('reponse', 'file createdAt') // Récupère le fichier et la date de la réponse
+            .populate('topic', 'title') // Récupère le titre du sujet
+            .populate('student', 'name email'); // Récupère le nom et email de l'étudiant
 
+        // Si aucune correction n'est trouvée, retourner un tableau vide
+        if (!corrections.length) {
+            return res.status(200).json([]);
+        }
+
+        // Formater les données pour le frontend
+        const formattedCorrections = corrections.map((correction) => ({
+            _id: correction._id,
+            submission_id: correction.reponse?._id?.toString(),
+            title: correction.topic?.title || "Sans titre",
+            submittedText: correction.submittedText,
+            correction: correction.correction,
+            model: correction.model,
+            score: correction.score,
+            feedback: correction.feedback,
+            description: correction.reponse?.createdAt
+                ? `Soumis le ${new Date(correction.reponse.createdAt).toLocaleDateString()}`
+                : "Date non disponible",
+            submission_file_url: correction.reponse?.file ? `/uploads/${correction.reponse.file}` : null,
+            correction_file_url: null, // Ajoute une logique si tu as un fichier de correction
+            createdAt: correction.createdAt,
+        }));
+
+        res.status(200).json(formattedCorrections);
     } catch (error) {
-        console.error(error);
+        console.error("Erreur dans getCorrectionsByStudent:", error);
         res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
     }
-}
+};
 
 //test
 
@@ -440,6 +559,7 @@ module.exports = {
     getCorrectionsForStudent,
     updateCorrectionFeedback,
     updateCorrectionScore,
-    getCorrectionsByStudent
+    getCorrectionsByStudent,
+    getDashboard,
 
 };

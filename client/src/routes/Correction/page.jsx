@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { FileText, Download, Star, Search } from "lucide-react";
 import { Footer } from "@/layouts/footer";
-// import { useTheme } from "@/hooks/use-theme";
 import axios from "axios";
 
 const StudentViewCorrectionsPage = () => {
-  // const { theme } = useTheme();
   const [corrections, setCorrections] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -17,8 +15,8 @@ const StudentViewCorrectionsPage = () => {
   // Fonction pour récupérer les corrections depuis l'API
   const fetchCorrections = useCallback(async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/getStudentCorrections`, {
-        withCredentials: true, // Envoie le cookie de session pour Passport
+      const response = await axios.get(`${BASE_URL}/corrections`, {
+        withCredentials: true, // Envoie le cookie pour JWT
       });
       setCorrections(response.data);
       setLoading(false);
@@ -26,9 +24,9 @@ const StudentViewCorrectionsPage = () => {
       setError(err.response ? err.response.data.message : "Erreur lors du chargement des corrections");
       setLoading(false);
     }
-  }, []); // Dépendances vides comme dans ton modèle
+  }, []);
 
-  // Charger les corrections au montage et toutes les 10 secondes (comme dans ton modèle)
+  // Charger les corrections au montage et toutes les 10 secondes
   useEffect(() => {
     fetchCorrections();
     const interval = setInterval(fetchCorrections, 10000);
@@ -40,7 +38,7 @@ const StudentViewCorrectionsPage = () => {
     (correction) =>
       correction.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       correction.feedback?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      correction.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      correction.submittedText?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Fonction pour télécharger un fichier
@@ -99,7 +97,7 @@ const StudentViewCorrectionsPage = () => {
           {filteredCorrections.length > 0 ? (
             filteredCorrections.map((correction) => (
               <div
-                key={correction.submission_id || correction._id}
+                key={correction._id}
                 className="card hover:shadow-lg transition-shadow duration-200"
               >
                 <div className="card-header">
@@ -113,10 +111,22 @@ const StudentViewCorrectionsPage = () => {
                     {correction.description || "Pas de description"}
                   </p>
                   <div className="flex flex-col gap-y-2">
-                    {correction.grade !== undefined && (
+                    {correction.score !== undefined && (
                       <div className="flex items-center gap-x-2 text-sm">
                         <Star size={16} className="text-yellow-500" />
-                        <span>Note: {correction.grade}/20</span>
+                        <span>Note: {correction.score}/20</span>
+                      </div>
+                    )}
+                    {correction.submittedText && (
+                      <div className="text-sm">
+                        <p className="font-medium">Texte soumis :</p>
+                        <p className="text-gray-600 dark:text-gray-400 truncate">{correction.submittedText}</p>
+                      </div>
+                    )}
+                    {correction.correction && (
+                      <div className="text-sm">
+                        <p className="font-medium">Correction :</p>
+                        <p className="text-gray-600 dark:text-gray-400">{correction.correction}</p>
                       </div>
                     )}
                     {correction.feedback && (
@@ -132,15 +142,6 @@ const StudentViewCorrectionsPage = () => {
                       >
                         <Download size={16} />
                         Ma soumission
-                      </button>
-                    )}
-                    {correction.correction_file_url && (
-                      <button
-                        onClick={() => downloadFile(correction.correction_file_url, `correction_${correction.title}`)}
-                        className="mt-2 inline-flex items-center gap-x-2 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                      >
-                        <Download size={16} />
-                        Correction
                       </button>
                     )}
                   </div>
