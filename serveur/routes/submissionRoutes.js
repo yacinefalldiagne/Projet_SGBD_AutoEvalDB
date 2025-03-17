@@ -27,6 +27,7 @@ router.get("/getReponse", getReponse)
 router.get("/getAssignments", getAssignments)
 router.get("/getStudentReponse", getReponsesByStudent)
 router.get("/getAllCorrections", getAllCorrections);
+router.get("/corrections", getCorrectionsByStudent);
 router.post("/generateCorrection/:reponseId", generateCorrectionForReponse);
 router.get("/getCorrectionsForStudent", getCorrectionsForStudent)
 router.put('/corrections/:correctionId/score', updateCorrectionScore);

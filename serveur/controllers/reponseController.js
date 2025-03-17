@@ -181,7 +181,24 @@ const getReponse = async (req, res) => {
     }
 };
 
-const generateCorrectionForReponse = async (req, res) => {
+
+
+// Nouvelle fonction pour récupérer les corrections d'un étudiant
+const getCorrectionsByStudent = async (req, res) => {
+    try {
+        // Vérifier l’authentification
+        if (!req.isAuthenticated()) {
+            return res.status(401).json({ message: "Vous devez être connecté pour consulter vos corrections." });
+        }
+
+        const userId = req.user._id.toString(); // ID de l’utilisateur connecté
+
+        // Récupérer les corrections
+        const corrections = await Correction.find({ student: userId })
+            .populate('reponse', 'file createdAt')
+            .populate('topic', 'title')
+
+        const generateCorrectionForReponse = async (req, res) => {
     try {
         const { reponseId } = req.params;
 
@@ -201,6 +218,40 @@ const generateCorrectionForReponse = async (req, res) => {
             return res.status(404).json({ message: "Réponse non trouvée." });
         }
 
+        // Si aucune correction, retourner un tableau vide (pas une erreur)
+        if (!corrections.length) {
+            return res.status(200).json([]); // Retourner un tableau vide au lieu de 404
+        }
+
+        // Formater les données
+        const formattedCorrections = await Promise.all(corrections.map(async (correction) => {
+            const reponse = correction.reponse;
+            let submissionFileUrl = null;
+            if (reponse && reponse.file) {
+                const encryptedFilePath = path.join('uploads', reponse.file);
+                try {
+                    const decryptedFilePath = await decryptFile(encryptedFilePath);
+                    submissionFileUrl = decryptedFilePath ? `/uploads/${path.basename(decryptedFilePath)}` : null;
+                } catch (decryptError) {
+                    console.error(`Erreur lors du déchiffrement du fichier ${reponse.file}:`, decryptError);
+                    submissionFileUrl = null; // Ne bloque pas la réponse
+                }
+            }
+            return {
+                submission_id: reponse ? reponse._id.toString() : null,
+                title: correction.topic ? correction.topic.title : "Sujet inconnu",
+                grade: correction.score,
+                feedback: correction.correction,
+                submission_file_url: submissionFileUrl,
+                correction_file_url: null,
+                description: reponse ? `Soumis le ${new Date(reponse.createdAt).toLocaleDateString()}` : "N/A",
+            };
+        }));
+
+        res.status(200).json(formattedCorrections);
+    } catch (error) {
+        console.error("Erreur dans getCorrectionsByStudent:", error);
+        res.status(500).json({ message: "Erreur serveur. Veuillez réessayer." });
         const topic = await Topic.findById(reponse.title);
         if (!topic) {
             return res.status(400).json({ message: "Le sujet spécifié n'existe pas." });

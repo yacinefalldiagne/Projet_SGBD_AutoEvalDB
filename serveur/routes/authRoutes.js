@@ -15,16 +15,18 @@ router.use(
     })
 );
 
+// Routes publiques
+router.get("/test", test); // Renommé pour éviter confusion avec la racine "/"
 // Routes classiques
 router.get("/", test);
 
 // Routes publiques
+
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 // Routes protégées (nécessitent d'être connecté)
-router.get("/profile", getProfile)
-
+router.get("/profile", verifyToken, getProfile); // Ajout de verifyToken pour sécuriser
 router.post("/logout", verifyToken, logoutUser);
 
 // Routes spécifiques aux rôles
@@ -42,14 +44,13 @@ router.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+        res.redirect(`${process.env.CLIENT_URL}/dashboard`);
         // Rediriger vers la page d'accueil du client
         if (req.user.role === "enseignant") {
             res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
@@ -67,14 +68,13 @@ router.get(
     "/auth/github/callback",
     passport.authenticate("github", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name, role: req.user.role, },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+        res.redirect(`${process.env.CLIENT_URL}/dashboard`);
         // Rediriger vers la page d'accueil du client
         if (req.user.role === "enseignant") {
             res.redirect(`${process.env.CLIENT_URL}/oauth-callback`);
@@ -92,15 +92,12 @@ router.get(
     "/auth/microsoft/callback",
     passport.authenticate("microsoft", { failureRedirect: `${process.env.CLIENT_URL}/login` }),
     (req, res) => {
-        // Création du token JWT
         const token = jwt.sign(
             { email: req.user.email, id: req.user._id, name: req.user.name },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-        // Définir le cookie
         res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
-        // Rediriger vers la page d'accueil du client
         res.redirect(`${process.env.CLIENT_URL}/dashboard`);
     }
 );
