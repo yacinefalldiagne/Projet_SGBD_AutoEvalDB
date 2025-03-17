@@ -227,22 +227,57 @@ const getReponse = async (req, res) => {
     }
 };
 
+
+
 // Nouvelle fonction pour récupérer les corrections d'un étudiant
 const getCorrectionsByStudent = async (req, res) => {
     try {
-        const userId = verifyToken(req);
+        // Vérifier l’authentification
+        if (!req.isAuthenticated()) {
+            return res.status(401).json({ message: "Vous devez être connecté pour consulter vos corrections." });
+        }
+
+        const userId = req.user._id.toString(); // ID de l’utilisateur connecté
+
+        // Récupérer les corrections
         const corrections = await Correction.find({ student: userId })
-            .populate('reponse')
+            .populate('reponse', 'file createdAt')
             .populate('topic', 'title')
             .populate('student', 'name email');
 
+        // Si aucune correction, retourner un tableau vide (pas une erreur)
         if (!corrections.length) {
-            return res.status(404).json({ message: "Aucune correction trouvée pour cet étudiant." });
+            return res.status(200).json([]); // Retourner un tableau vide au lieu de 404
         }
 
-        res.status(200).json(corrections);
+        // Formater les données
+        const formattedCorrections = await Promise.all(corrections.map(async (correction) => {
+            const reponse = correction.reponse;
+            let submissionFileUrl = null;
+            if (reponse && reponse.file) {
+                const encryptedFilePath = path.join('uploads', reponse.file);
+                try {
+                    const decryptedFilePath = await decryptFile(encryptedFilePath);
+                    submissionFileUrl = decryptedFilePath ? `/uploads/${path.basename(decryptedFilePath)}` : null;
+                } catch (decryptError) {
+                    console.error(`Erreur lors du déchiffrement du fichier ${reponse.file}:`, decryptError);
+                    submissionFileUrl = null; // Ne bloque pas la réponse
+                }
+            }
+            return {
+                submission_id: reponse ? reponse._id.toString() : null,
+                title: correction.topic ? correction.topic.title : "Sujet inconnu",
+                grade: correction.score,
+                feedback: correction.correction,
+                submission_file_url: submissionFileUrl,
+                correction_file_url: null,
+                description: reponse ? `Soumis le ${new Date(reponse.createdAt).toLocaleDateString()}` : "N/A",
+            };
+        }));
+
+        res.status(200).json(formattedCorrections);
     } catch (error) {
-        console.error(error);
+        console.error("Erreur dans getCorrectionsByStudent:", error);
         res.status(500).json({ message: "Erreur serveur. Veuillez réessayer." });
     }
 };

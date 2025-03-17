@@ -85,6 +85,7 @@ function App() {
             { path: "sujets", element: <StudentAssignmentsPage /> },
             { path: "soumettre", element: <StudentSubmitResponsePage /> },
             { path: "correction", element: <StudentViewCorrectionsPage /> },
+            { path: "settings", element: <SettingsPage /> },
           ],
         },
       ],

@@ -20,5 +20,5 @@ router.get("/getAssignments", getAssignments)
 router.get("/getStudentReponse", getReponsesByStudent)
 router.get("/getStudentCorrections", getCorrectionsByStudent);
 router.get("/getAllCorrections", getAllCorrections);
-
+router.get("/corrections", getCorrectionsByStudent);
 module.exports = router
