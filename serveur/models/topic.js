@@ -4,17 +4,17 @@ const { Schema } = mongoose;
 const correctionSchema = new Schema({
     model: {
         type: String,
-        required: true,
+        // required: true,
     },
     correction: {
         type: String,
-        required: true,
+        // required: true,
     },
     score: {
         type: Number,
         min: 0,
         max: 20,
-        required: true,
+        // required: true,
     },
 });
 

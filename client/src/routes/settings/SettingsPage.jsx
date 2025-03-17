@@ -1,11 +1,7 @@
-import { useState } from "react";
-import Switch from "@/components/ui/Switch";
-import Button from "@/components/ui/Button";
-
 // client/src/routes/settings/SettingsPage.jsx
 import { useState, useEffect } from "react";
-import Switch from "@/components/ui/Switch"; 
-import Button from "@/components/ui/Button"; 
+import Switch from "@/components/ui/Switch";
+import Button from "@/components/ui/Button";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -15,34 +11,12 @@ function SettingsPage() {
     const [notifications, setNotifications] = useState(true);
     const [language, setLanguage] = useState("fr");
 
-    return (
-        <div className="p-6 max-w-3xl mx-auto space-y-6">
-            <h1 className="text-2xl font-bold">Paramètres du compte</h1>
-
-            {/* Informations personnelles */}
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
-                <h2 className="text-lg font-semibold mb-3">Informations personnelles</h2>
-
-
-                <input type="text" placeholder="Nom" className="w-full p-2 border rounded" />
-                <input type="text" placeholder="Prénom" className="w-full p-2 border mt-2 rounded" />
-                <Button className="mt-3">Mettre à jour</Button>
-            </div>
-
-const [profileImage, setProfileImage] = useState(null);
-    const [name, setName] = useState("");
-    const [mustResetPassword, setMustResetPassword] = useState(false);
-    const navigate = useNavigate();
-
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
     useEffect(() => {
         const loadUserData = async () => {
             try {
-                const response = await axios.get(`${apiUrl}/user`, { withCredentials: true });
+                const response = await axios.get(`"http://localhost:8000/profile"`, { withCredentials: true });
                 const user = response.data;
                 setName(user.name);
-                setProfileImage(user.profilePicture ? `${apiUrl}/uploads/profile-images/${user.profilePicture}` : "default-avatar.png");
                 setDarkMode(user.preferences.darkMode);
                 setNotifications(user.preferences.notifications);
                 setLanguage(user.preferences.language);
@@ -52,25 +26,14 @@ const [profileImage, setProfileImage] = useState(null);
             }
         };
         loadUserData();
-    }, [apiUrl]);
+    }, "http://localhost:8000/profile");
 
-    const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setProfileImage(reader.result);
-            reader.readAsDataURL(file);
-        }
-    };
 
     const handleUpdatePersonalInfo = async () => {
         try {
             const formData = new FormData();
             formData.append("name", name);
-            if (profileImage && profileImage.startsWith("data:")) {
-                const fileInput = document.querySelector("#profile-image");
-                formData.append("profileImage", fileInput.files[0]);
-            }
+
             const response = await axios.put(`${apiUrl}/update-personal-info`, formData, {
                 withCredentials: true,
                 headers: { "Content-Type": "multipart/form-data" },
@@ -124,16 +87,6 @@ const [profileImage, setProfileImage] = useState(null);
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            await axios.post(`${apiUrl}/logout`, {}, { withCredentials: true });
-            toast.success("Déconnexion réussie");
-            navigate("/login");
-        } catch (error) {
-            toast.error("Erreur lors de la déconnexion");
-        }
-    };
-
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
             <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
@@ -142,28 +95,7 @@ const [profileImage, setProfileImage] = useState(null);
                 {/* Informations personnelles */}
                 <section className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Profil</h2>
-                    <div className="flex items-center space-x-4">
-                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600">
-                            <img
-                                src={profileImage || "default-avatar.png"}
-                                alt="Profile"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Photo de profil</label>
-                            <input
-                                type="file"
-                                id="profile-image"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleImageChange}
-                            />
-                            <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                                <label htmlFor="profile-image" className="cursor-pointer">Changer</label>
-                            </Button>
-                        </div>
-                    </div>
+
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom</label>
                         <input
@@ -210,30 +142,31 @@ const [profileImage, setProfileImage] = useState(null);
                 {/* Sécurité */}
                 <section className="mb-8">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Sécurité</h2>
-                    {mustResetPassword && (
-                        <p className="text-red-500 mb-4 font-medium">Vous devez définir un mot de passe.</p>
-                    )}
+
+                    <p className="text-red-500 mb-4 font-medium">Vous devez définir un mot de passe.</p>
+
                     <Button onClick={handleChangePassword} className="bg-red-500 hover:bg-red-600 text-white">
-                        {mustResetPassword ? "Définir un mot de passe" : "Changer le mot de passe"}
+                        {/* {mustResetPassword ? "Définir un mot de passe" : "Changer le mot de passe"} */}
                     </Button>
                 </section>
 
-            {/* Actions */}
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
-                <h2 className="text-lg font-semibold mb-3">Actions du compte</h2>
-                <Button className="bg-red-500 hover:bg-red-600 text-white mt-3">Supprimer le compte</Button>
                 {/* Actions */}
-                <section>
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Actions</h2>
-                    <div className="flex space-x-4">
-                        <Button onClick={handleLogout} className="bg-gray-600 hover:bg-gray-700 text-white">
-                            Déconnexion
-                        </Button>
-                        <Button onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white">
-                            Supprimer le compte
-                        </Button>
-                    </div>
-                </section>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow">
+                    <h2 className="text-lg font-semibold mb-3">Actions du compte</h2>
+                    <Button className="bg-red-500 hover:bg-red-600 text-white mt-3">Supprimer le compte</Button>
+                    {/* Actions */}
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Actions</h2>
+                        <div className="flex space-x-4">
+                            {/* <Button onClick={handleLogout} className="bg-gray-600 hover:bg-gray-700 text-white">
+                                Déconnexion
+                            </Button> */}
+                            <Button onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white">
+                                Supprimer le compte
+                            </Button>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     );
