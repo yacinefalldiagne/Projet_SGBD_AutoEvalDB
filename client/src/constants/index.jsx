@@ -21,6 +21,8 @@ export const navbarLinksEtudiant = [
         title: "Settings",
         links: [
             { label: "Paramètres", icon: Settings, path: "/etudiant/settings" },
+            { label: "Déconnexion", icon: LogOut, path: "/logout" },
+
         ],
     },
 ];

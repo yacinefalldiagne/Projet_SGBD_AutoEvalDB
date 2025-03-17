@@ -18,7 +18,6 @@ mongoose
         serverSelectionTimeoutMS: 5000, // Ajouter un timeout plus court pour la sélection du serveur
         socketTimeoutMS: 45000,
     })
-    .connect(process.env.MONGO_URI) // Supprimez les options obsolètes
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("DB not connected", err));
 

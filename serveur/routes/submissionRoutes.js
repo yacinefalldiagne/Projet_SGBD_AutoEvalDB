@@ -10,7 +10,8 @@ const {
     generateCorrectionForReponse,
     getCorrectionsForStudent,
     updateCorrectionScore,
-    updateCorrectionFeedback
+    updateCorrectionFeedback,
+    getCorrectionsByStudent
 
 } = require("../controllers/reponseController");
 
