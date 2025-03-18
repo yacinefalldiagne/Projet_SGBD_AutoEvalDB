@@ -1,20 +1,18 @@
-// controllers/settingsController.js
 const User = require("../models/user");
-const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const { hashPassword, comparePassword } = require('../helpers/auth');
+
 
 // Récupérer les données du profil
 exports.getProfile = async (req, res) => {
     try {
         const { token } = req.cookies;
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                const userId = decoded.id;
-                const user = await User.findById(userId).select("-password");
-        // req.user est défini par le middleware passport.authenticate("jwt")
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
-        // Mapper preferences.notifications à notificationsEnabled pour le frontend
         const userData = {
             name: user.name,
             email: user.email,
@@ -35,10 +33,12 @@ exports.updateProfile = async (req, res) => {
     try {
         const { name, email, notificationsEnabled } = req.body;
 
-        // Vérifier si l'email est déjà utilisé par un autre utilisateur
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
         if (email) {
             const existingUser = await User.findOne({ email });
-            if (existingUser && existingUser._id.toString() !== req.user.id) {
+            if (existingUser && existingUser._id.toString() !== userId) {
                 return res.status(400).json({ message: "Cet email est déjà utilisé" });
             }
         }
@@ -49,9 +49,10 @@ exports.updateProfile = async (req, res) => {
             updateData["preferences.notifications"] = notificationsEnabled;
         }
 
+
         // Mettre à jour l'utilisateur
         const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
+            userId,
             { $set: updateData },
             { new: true, runValidators: true }
         ).select("-password");
@@ -60,7 +61,6 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        // Mapper les données pour le frontend
         const userData = {
             name: updatedUser.name,
             email: updatedUser.email,
@@ -81,28 +81,27 @@ exports.updateProfile = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const user = await User.findById(userId);
 
-        // Récupérer l'utilisateur via req.user (fourni par Passport)
-        const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: "Utilisateur non trouvé" });
         }
 
-        // Vérifier si l'utilisateur a un mot de passe local (non-OAuth)
         if (!user.password) {
             return res.status(400).json({
-                message:
-                    "Impossible de changer le mot de passe. Ce compte est lié à un fournisseur OAuth (Google, GitHub, Microsoft).",
+                message: "Impossible de changer le mot de passe. Ce compte est lié à un fournisseur OAuth.",
             });
         }
 
-        // Vérifier le mot de passe actuel
-        const isMatch = await user.comparePassword(currentPassword);
+        const isMatch = await comparePassword(currentPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Mot de passe actuel incorrect" });
         }
 
-        // Mettre à jour le mot de passe
+        // Assigner le mot de passe en clair, le middleware pre("save") le hachera
         user.password = newPassword;
         await user.save();
 

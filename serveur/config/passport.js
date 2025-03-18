@@ -9,7 +9,7 @@ const User = require("../models/user");
 // Configuration de la stratégie JWT
 const jwtOpts = {};
 jwtOpts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-jwtOpts.secretOrKey = process.env.JWT_SECRET || "your_jwt_secret";
+jwtOpts.secretOrKey = process.env.JWT_SECRET;
 
 module.exports = function (passport) {
     // Sérialisation de l'utilisateur pour les sessions
@@ -85,7 +85,7 @@ module.exports = function (passport) {
                         googleId: profile.id,
                         preferences: {
                             darkMode: false,
-                            notifications: true, // Correspond à notificationsEnabled dans le frontend
+                            notifications: true,
                             language: "fr",
                         },
                     });
@@ -142,7 +142,7 @@ module.exports = function (passport) {
                         githubId: profile.id,
                         preferences: {
                             darkMode: false,
-                            notifications: true, // Correspond à notificationsEnabled dans le frontend
+                            notifications: true,
                             language: "fr",
                         },
                     });
@@ -201,7 +201,7 @@ module.exports = function (passport) {
                         microsoftId: profile.id,
                         preferences: {
                             darkMode: false,
-                            notifications: true, // Correspond à notificationsEnabled dans le frontend
+                            notifications: true,
                             language: "fr",
                         },
                     });

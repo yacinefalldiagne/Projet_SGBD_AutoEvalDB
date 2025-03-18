@@ -1,19 +1,19 @@
 // routes/settingsRoutes.js
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
+const cors = require("cors");
 const settingsController = require("../controllers/settingsController");
 
-// Middleware pour protéger les routes (authentification JWT)
-const authMiddleware = passport.authenticate("jwt", { session: false });
+// Middleware CORS
+router.use(
+    cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+    })
+);
 
-// Route pour récupérer les données du profil
-router.get("/api/student/profile", authMiddleware, settingsController.getProfile);
-
-// Route pour mettre à jour les données du profil
-router.put("/api/student/profile", authMiddleware, settingsController.updateProfile);
-
-// Route pour changer le mot de passe
-router.put("/api/student/password", authMiddleware, settingsController.changePassword);
+router.get("/api/student/profile", settingsController.getProfile);
+router.put("/api/student/profile", settingsController.updateProfile);
+router.put("/api/student/password", settingsController.changePassword);
 
 module.exports = router;

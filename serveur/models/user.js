@@ -1,10 +1,10 @@
-// models/user.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
+const { hashPassword } = require('../helpers/auth'); // Importer hashPassword
 
 const userSchema = new Schema({
-    name: { type: String, required: true }, // Restaurer le champ "name"
+    name: { type: String, required: true },
     email: {
         type: String,
         trim: true,
@@ -13,7 +13,6 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        // Rendre le password optionnel pour les connexions OAuth
         required: function () {
             return !this.googleId && !this.githubId && !this.microsoftId;
         }
@@ -34,12 +33,15 @@ const userSchema = new Schema({
     },
 }, { timestamps: true });
 
-// Hacher le mot de passe avant de sauvegarder (pour les utilisateurs non-OAuth)
+// Hacher le mot de passe avant de sauvegarder avec hashPassword de auth.js
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password") || !this.password) return next();
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+    try {
+        this.password = await hashPassword(this.password); // Utiliser hashPassword (12 tours)
+        next();
+    } catch (err) {
+        next(err); // Passer l'erreur au middleware suivant
+    }
 });
 
 // Comparer les mots de passe

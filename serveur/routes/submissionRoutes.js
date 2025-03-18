@@ -21,6 +21,6 @@ router.post("/generateCorrection/:reponseId", generateCorrectionForReponse);
 router.get("/getCorrectionsForStudent", getCorrectionsForStudent);
 router.put('/corrections/:correctionId/score', updateCorrectionScore);
 router.put('/corrections/:correctionId/feedback', updateCorrectionFeedback);
-router.get("/dashboard", getDashboard); // Nouvelle route
+router.get("/dashboard", getDashboard);
 
 module.exports = router;
