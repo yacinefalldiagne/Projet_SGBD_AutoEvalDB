@@ -21,12 +21,12 @@ mongoose
 
 const port = process.env.PORT || 8000;
 
-app.use(cors({
-  origin: ['https://client-phi-beige.vercel.app', 'https://projet-sgbd-autoevaldb-2.onrender.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "https://client-phi-beige.vercel.app",
+        credentials: true,
+    })
+);
 
 // Middleware pour parser les JSON
 app.use(express.json());
