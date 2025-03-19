@@ -32,7 +32,7 @@ L'objectif de ce projet est de concevoir et développer une plateforme web perme
 
 ### Technologies utilisées
 
-!template preview](https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB/blob/amina/screenshots/technologies.png)
+![template preview](https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB/blob/amina/screenshots/technologies.png)
 
 #### 1. Front End :
   React JS
