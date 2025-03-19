@@ -2,7 +2,7 @@
 
 Projet de SGBD (sytème de gestion de base de données) réalisé en groupe à l'ESP
 
- [CoverFile](https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB/blob/amina/screenshots/cover.png)
+ [CoverFile](screenshots/cover.png)
 
 
 ## Description
