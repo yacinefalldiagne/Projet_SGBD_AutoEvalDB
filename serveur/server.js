@@ -21,18 +21,13 @@ mongoose
 
 const port = process.env.PORT || 8000;
 
-const allowedOrigins = ['http://localhost', 'http://localhost:3000', "https://client-phi-beige.vercel.app"];
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "https://client-phi-beige.vercel.app",
+        credentials: true,
+    })
+);
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-}))
 
 // Middleware pour parser les JSON
 app.use(express.json());
