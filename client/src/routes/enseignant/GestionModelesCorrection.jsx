@@ -24,7 +24,7 @@ function GestionModelesCorrection() {
     const [fetchingAssignments, setFetchingAssignments] = useState(true);
     const [error, setError] = useState(null);
     const [generationCompleted, setGenerationCompleted] = useState(false);
-    const BASE_URL = "http://localhost:8000";
+    const BASE_URL = `${import.meta.env.VITE_API_URL}`;
 
     const fetchAssignments = useCallback(async () => {
         try {

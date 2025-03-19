@@ -24,7 +24,7 @@ function CorrectionAuto() {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [actionToConfirm, setActionToConfirm] = useState(null);
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_URL}`
 
   // Récupérer les corrections de l'étudiant
   useEffect(() => {

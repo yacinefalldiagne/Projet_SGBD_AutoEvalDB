@@ -22,7 +22,7 @@ export function Login() {
         const { email, password } = data;
         try {
 
-            const { data } = await axios.post("http://localhost:8000/login", { email, password }, { withCredentials: true });
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/login`, { email, password }, { withCredentials: true });
             toast.success(data.message)
             if (data.error) {
                 toast.error(data.error);
@@ -45,15 +45,15 @@ export function Login() {
 
     // Fonctions pour gérer l'authentification OAuth
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:8000/auth/google";
+        window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     };
 
     const handleGithubLogin = () => {
-        window.location.href = "http://localhost:8000/auth/github";
+        window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
     };
 
     const handleMicrosoftLogin = () => {
-        window.location.href = "http://localhost:8000/auth/microsoft";
+        window.location.href = `${import.meta.env.VITE_API_URL}/auth/microsoft`;
     };
 
     return (

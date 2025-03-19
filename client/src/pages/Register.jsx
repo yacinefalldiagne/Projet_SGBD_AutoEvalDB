@@ -23,7 +23,7 @@ export default function Register() {
         const { name, email, password, role } = data;
 
         try {
-            const response = await axios.post("http://localhost:8000/register",
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/register`,
                 { name, email, password, role },
                 { withCredentials: true }
             );

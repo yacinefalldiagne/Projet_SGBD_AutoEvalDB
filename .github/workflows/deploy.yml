@@ -1,0 +1,73 @@
+name: Build and Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Étape 1 : Cloner le dépôt
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Se connecter à Docker Hub ou GHCR
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          # Pour GHCR, ajoutez :
+          # registry: ghcr.io
+
+      # Étape 3 : Construire et pousser l'image frontend
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./client
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}
+          # Pour GHCR :
+          # tags: ghcr.io/${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}
+
+      # Étape 4 : Construire et pousser l'image backend
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./serveur
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+          # Pour GHCR :
+          # tags: ghcr.io/${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      # Étape 1 : Cloner le dépôt
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configurer kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # Étape 3 : Configurer le contexte Kubernetes
+      - name: Set Kubernetes context
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          export KUBECONFIG=kubeconfig.yaml
+          kubectl config use-context votre-contexte
+
+      # Étape 4 : Déployer sur Kubernetes
+      - name: Deploy to Kubernetes
+        run: |
+          # Mettre à jour les manifests avec la nouvelle version de l'image
+          sed -i "s|${{ secrets.DOCKER_USERNAME }}/frontend:.*|${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}|g" k8s/frontend-deployment.yaml
+          sed -i "s|${{ secrets.DOCKER_USERNAME }}/backend:.*|${{ secrets.DOCKER_USERNAME }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          # Appliquer les manifests
+          kubectl apply -f k8s/

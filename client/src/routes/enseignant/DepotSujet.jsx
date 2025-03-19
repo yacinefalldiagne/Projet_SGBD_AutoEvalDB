@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Trash2 } from "lucide-react";
-import Button from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Button from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import { UserContext } from "@/contexts/user-context";
 import { useDropzone } from "react-dropzone";
 import axios from 'axios';
@@ -89,7 +89,7 @@ const FileManager = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/createTopic', data, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createTopic`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

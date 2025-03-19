@@ -8,7 +8,7 @@ export function UserContextProvider({ children }) {
 
     useEffect(() => {
         // Appel de l'API pour obtenir les informations utilisateur
-        axios.get('http://localhost:8000/profile', { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_API_URL}/profile`, { withCredentials: true })
             .then(({ data }) => {
                 // Vérifiez si la réponse contient l'objet "user"
                 if (data?.user) {

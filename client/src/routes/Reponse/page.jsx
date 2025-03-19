@@ -23,7 +23,7 @@ const StudentSubmitResponsePage = () => {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/getAssignments');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/getAssignements`);
         setAssignments(response.data);
       } catch (err) {
         setMessage('Erreur lors de la récupération des sujets.');
@@ -66,7 +66,7 @@ const StudentSubmitResponsePage = () => {
     console.log("Données envoyées:", Object.fromEntries(data.entries()));
 
     try {
-      const response = await axios.post('http://localhost:8000/createReponse', data, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/createReponse`, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
