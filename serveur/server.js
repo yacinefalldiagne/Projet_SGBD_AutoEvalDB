@@ -21,7 +21,7 @@ mongoose
 
 const port = process.env.PORT || 8000;
 
-const allowedOrigins = ['http://localhost', 'http://localhost:3000', 'https://projet-sgbd-autoevaldb-2.onrender.com'];
+const allowedOrigins = ['http://localhost', 'http://localhost:3000', "https://projet-sgbd-autoevaldb-2.onrender.com"];
 
 app.use(cors({
     origin: (origin, callback) => {
