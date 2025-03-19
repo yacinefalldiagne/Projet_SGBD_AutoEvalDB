@@ -1,14 +1,12 @@
-const fs = require('fs');
 const pdf = require('pdf-parse');
 
-const extractTextFromPDF = async (filePath) => {
+const extractTextFromPDF = async (buffer) => {
     try {
-        console.log('Début de l\'extraction du texte pour le fichier :', filePath);
-        if (!fs.existsSync(filePath)) {
-            throw new Error('Fichier PDF non trouvé sur le serveur');
+        console.log('Début de l\'extraction du texte à partir du buffer');
+        if (!buffer || !(buffer instanceof Buffer) || buffer.length === 0) {
+            throw new Error('Buffer invalide ou vide');
         }
-        const dataBuffer = fs.readFileSync(filePath);
-        const data = await pdf(dataBuffer);
+        const data = await pdf(buffer);
         // console.log('Texte extrait avec succès :', data.text);
         return data.text; // Retourne le texte extrait
     } catch (error) {
