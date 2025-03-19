@@ -28,7 +28,6 @@ app.use(
     })
 );
 
-
 // Middleware pour parser les JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
