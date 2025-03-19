@@ -1,4 +1,4 @@
-# Plateforme intelligente d'évaluation automatisée des exercices de bases dedonnées
+# Plateforme intelligente d'évaluation automatisée des exercices de bases de données
 
 Projet de SGBD (sytème de gestion de base de données) réalisé en groupe à l'ESP
 
@@ -9,9 +9,9 @@ Projet de SGBD (sytème de gestion de base de données) réalisé en groupe à l
 
 L'objectif de ce projet est de concevoir et développer une plateforme web permettant aux professeurs de déposer des sujets d’exercices en bases de données et aux étudiants de soumettre leurs réponses sous forme de fichiers PDF. Le projet intégrera un moteur d’intelligence artificielle basé sur DeepSeek via Ollama
 
-<!-- #### Présentation PowerPoint: [click here](https://docs.google.com/presentation/d/1wpXHRbTdrj8j-Nax4serAhtAG2Ml-qTSQWAy5bLAW0I/edit?usp=sharing)  <br> -->
+#### Présentation PowerPoint: [click here](https://docs.google.com/presentation/d/1d46KOFQ03woHup8jB9OGuX279hMweZSu3i3uLnbdmrg/edit?usp=sharing)  <br>
+#### Rapport de projet : [click here](https://docs.google.com/document/d/1mHV5iMTsdMGgk3-IY0vaUpcdU9FVqR830LmGinHtauU/edit?usp=sharing)
 
-<!-- #### Rapport de projet : [click here](https://docs.google.com/document/d/1Jihqa3khZIEIaghmiaQ51xmGEDJH79BnCffpxaUO3u0/edit?usp=sharing) -->
 
 ## Equipe projet
 
@@ -27,11 +27,12 @@ L'objectif de ce projet est de concevoir et développer une plateforme web perme
 
  Consultez la démo ici 👉️ <!-- [https://mosaic.cruip.com/](https://mosaic.cruip.com/) -->
 
-  ## Utilisation
+## Pré-requis
 
-This project was bootstrapped with [Vite](https://vitejs.dev/).
 
 ### Technologies utilisées
+
+<!-- ![Mosaic Tailwind admin template preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1) -->
 
 #### 1. Front End :
   React JS
@@ -53,27 +54,21 @@ This project was bootstrapped with [Vite](https://vitejs.dev/).
 
 
 ### Installation
-- Dans client : 
+``` bash
+# clone the repo
+$ git clone https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB.git my-project
 
-```
-npm install
-```
+# go into client's directory
+$ cd my-project/client
 
-#### Compiles and hot-reloads for development
-```
-npm run dev
-```
+# install client's dependencies
+$ npm install
 
-- Dans serveur :
+# go into server's directory
+$ cd my-project/server
 
-```
-npm install
-```
-
-#### Compiles and hot-reloads for development
-
-```
-nodemon server.js
+# install server's dependencies
+$ npm install
 ```
 
 ## Snapshots

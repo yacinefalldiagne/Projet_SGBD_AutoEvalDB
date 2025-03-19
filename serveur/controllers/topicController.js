@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const Topic = require('../models/topic');
 const User = require('../models/user');
+const Correction = require('../models/correction');
+const Reponse = require('../models/reponse');
 const multer = require('multer');
 const fs = require('fs');
 const mongoose = require('mongoose');
@@ -302,6 +304,164 @@ const downloadCorrectionAsPDF = async (req, res) => {
     }
 };
 
+const getTeacherDashboard = async (req, res) => {
+    try {
+
+
+        const { token } = req.cookies;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'enseignant') {
+            return res.status(403).json({ message: "Seuls les enseignants peuvent accéder à ce tableau de bord." });
+        }
+
+        // 1. Total des étudiants
+        const totalStudents = await User.countDocuments({ role: 'etudiant' });
+
+        // 2. Toutes les corrections et réponses
+        const allCorrections = await Correction.find()
+            .populate('student', 'name email role')
+            .populate('topic', 'title')
+            .lean();
+        const allResponses = await Reponse.find()
+            .populate('student', 'name email')
+            .populate('title', 'title')
+            .lean();
+
+        const studentCorrections = allCorrections.filter(corr => corr.student && corr.student.role === 'etudiant');
+
+        // 3. Moyenne générale
+        const totalScore = studentCorrections.reduce((sum, corr) => sum + (corr.score || 0), 0);
+        const generalAverage = studentCorrections.length > 0 ? totalScore / studentCorrections.length : 0;
+
+        // 4. Taux de réussite (notes > 10)
+        const successfulCorrections = studentCorrections.filter(corr => corr.score > 10);
+        const successRate = studentCorrections.length > 0 ? (successfulCorrections.length / studentCorrections.length) * 100 : 0;
+
+        // 5. Nombre de soumissions totales
+        const totalSubmissions = allResponses.length;
+
+        // 6. Taux de requêtes SQL et erreurs SQL dans le feedback
+        const sqlKeywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'JOIN'];
+        const errorKeywords = ['error', 'incorrect', 'mistake', 'wrong', 'syntax'];
+
+        const sqlRequestsCount = studentCorrections.filter(corr =>
+            corr.feedback && sqlKeywords.some(keyword => corr.feedback.toLowerCase().includes(keyword.toLowerCase()))
+        ).length;
+        const sqlErrorsCount = studentCorrections.filter(corr =>
+            corr.feedback && errorKeywords.some(keyword => corr.feedback.toLowerCase().includes(keyword.toLowerCase()))
+        ).length;
+
+        const sqlRequestsRate = studentCorrections.length > 0 ? (sqlRequestsCount / studentCorrections.length) * 100 : 0;
+        const sqlErrorsRate = studentCorrections.length > 0 ? (sqlErrorsCount / studentCorrections.length) * 100 : 0;
+
+        // 7. Feedback moyen (nombre de mots)
+        const feedbackWordCount = studentCorrections.map(corr =>
+            corr.feedback ? corr.feedback.split(/\s+/).length : 0
+        );
+        const averageFeedbackWords = feedbackWordCount.length > 0
+            ? feedbackWordCount.reduce((sum, count) => sum + count, 0) / feedbackWordCount.length
+            : 0;
+
+        // 8. Évolution des moyennes par devoir soumis
+        const topics = await Topic.find().lean();
+        const progression = topics.map(topic => {
+            const topicCorrections = studentCorrections.filter(corr =>
+                corr.topic && corr.topic._id.toString() === topic._id.toString()
+            );
+            const totalScore = topicCorrections.reduce((sum, corr) => sum + (corr.score || 0), 0);
+            const average = topicCorrections.length > 0 ? totalScore / topicCorrections.length : 0;
+            return {
+                name: topic.title,
+                moyenne: average.toFixed(2),
+            };
+        }).filter(item => item.moyenne > 0);
+
+        // 9. Dernières évaluations (10 dernières corrections)
+        const latestEvaluations = studentCorrections
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 10)
+            .map(corr => ({
+                id: corr._id.toString(),
+                nom: corr.student.name,
+                typeExercice: corr.topic ? corr.topic.title : "Sans titre",
+                note: corr.score || 0,
+                email: corr.student.email,
+            }));
+
+        // 10. Erreurs fréquentes détectées par l'IA
+        const errorTypes = {};
+        studentCorrections.forEach(corr => {
+            if (corr.feedback) {
+                const feedbackLower = corr.feedback.toLowerCase();
+                if (errorKeywords.some(keyword => feedbackLower.includes(keyword))) {
+                    const errorType = feedbackLower.includes('syntax') ? "Syntaxe SQL incorrecte" :
+                        feedbackLower.includes('normalisation') ? "Mauvaise normalisation" :
+                            "Erreur dans le modèle conceptuel";
+                    errorTypes[errorType] = (errorTypes[errorType] || 0) + 1;
+                }
+            }
+        });
+        const frequentErrors = Object.entries(errorTypes)
+            .map(([typeErreur, occurrences]) => ({ typeErreur, occurrences }))
+            .sort((a, b) => b.occurrences - a.occurrences)
+            .slice(0, 3);
+
+        // 11. Classement des étudiants
+        const studentStats = {};
+        studentCorrections.forEach(corr => {
+            const studentId = corr.student._id.toString();
+            if (!studentStats[studentId]) {
+                studentStats[studentId] = {
+                    nom: corr.student.name,
+                    email: corr.student.email,
+                    totalScore: 0,
+                    count: 0,
+                };
+            }
+            studentStats[studentId].totalScore += corr.score || 0;
+            studentStats[studentId].count += 1;
+        });
+
+        const topStudents = Object.entries(studentStats)
+            .map(([id, stats], index) => ({
+                numero: index + 1,
+                nom: stats.nom,
+                description: "Étudiant", // À adapter si vous avez des groupes ou types
+                moyenne: (stats.totalScore / stats.count).toFixed(1),
+                statut: stats.totalScore / stats.count >= 16 ? "Excellent" :
+                    stats.totalScore / stats.count >= 14 ? "Très Bien" : "Bien",
+                heures: 0, // À calculer si vous avez des données d'assiduité
+                assiduite: 0, // À calculer si vous avez des données
+            }))
+            .sort((a, b) => b.moyenne - a.moyenne)
+            .slice(0, 8);
+
+        // Réponse finale
+        const dashboardData = {
+            totalStudents,
+            generalAverage: generalAverage.toFixed(1),
+            successRate: successRate.toFixed(2),
+            totalSubmissions,
+            sqlRequestsRate: sqlRequestsRate.toFixed(2),
+            sqlErrorsRate: sqlErrorsRate.toFixed(2),
+            averageFeedbackWords: Math.round(averageFeedbackWords),
+            progression,
+            latestEvaluations,
+            frequentErrors,
+            topStudents,
+        };
+
+        res.status(200).json(dashboardData);
+    } catch (error) {
+        console.error("Erreur dans getTeacherDashboard:", error);
+        res.status(500).json({ message: error.message || "Erreur serveur. Veuillez réessayer." });
+    }
+};
+
+
 module.exports = {
     createTopic,
     getTopic,
@@ -309,4 +469,5 @@ module.exports = {
     generateCorrectionsForTopic,
     downloadCorrectionAsPDF,
     publishTopic,
+    getTeacherDashboard,
 };

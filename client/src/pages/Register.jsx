@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import pattern from "../assets/images/pattern.png";
+import pattern from "../assets/images/pattern.jpg";
 import github from "../assets/images/github.svg";
 import { ArrowLeft } from 'lucide-react';
 import { useState } from "react";
@@ -29,7 +29,7 @@ export default function Register() {
             );
 
             if (response.data.error) {
-                toast.error(response.data.error); // Afficher l'erreur retournée par le backend
+                toast.error(response.data.error);
             } else {
                 setData({ name: '', email: '', password: '', role: 'etudiant' });
 
@@ -49,7 +49,7 @@ export default function Register() {
 
     return (
         <section className="m-8 flex">
-            <div className="w-2/5 h-full hidden lg:block relative">
+            <div className="w-3/5 h-full hidden lg:block relative">
                 <img
                     src={pattern}
                     className="h-full w-full object-cover rounded-3xl"

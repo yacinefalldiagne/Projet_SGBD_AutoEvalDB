@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import pattern from "../assets/images/pattern.png";
+import pattern from "../assets/images/pattern.jpg";
 import github from "../assets/images/github.svg";
 import { ArrowLeft } from 'lucide-react';
 import { useState, useContext } from "react";
@@ -34,7 +34,7 @@ export function Login() {
                 } else if (data.user.role === "etudiant") {
                     navigate('/etudiant');
                 } else {
-                    navigate('/etudiant'); // Page générique si le rôle est inconnu
+                    navigate('/etudiant');
                 }
             }
         } catch (error) {
@@ -133,7 +133,7 @@ export function Login() {
                             <img src={github} height={24} width={24} alt="GitHub Logo" />
                             <span>Se connecter avec GitHub</span>
                         </button>
-                        <button
+                        {/* <button
                             type="button"
                             onClick={handleMicrosoftLogin}
                             className="flex items-center gap-2 justify-center shadow-md w-full bg-white p-2 rounded-lg hover:bg-gray-50 transition-colors"
@@ -145,7 +145,7 @@ export function Login() {
                                 <path d="M20 11H11V20H20V11Z" fill="#FFB900" />
                             </svg>
                             <span>Se connecter avec Microsoft</span>
-                        </button>
+                        </button> */}
                     </div>
                     <p className="text-center text-blue-gray-500 font-medium mt-4">
                         Pas encore inscrit?
@@ -153,7 +153,7 @@ export function Login() {
                     </p>
                 </form>
             </div>
-            <div className="w-2/5 h-full hidden lg:block">
+            <div className="w-3/5 h-full hidden lg:block">
                 <img
                     src={pattern}
                     className="h-full w-full object-cover rounded-3xl"

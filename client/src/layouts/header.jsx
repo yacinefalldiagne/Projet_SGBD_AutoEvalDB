@@ -2,8 +2,6 @@ import { useTheme } from "@/hooks/use-theme";
 
 import { Bell, ChevronsLeft, Moon, Search, Sun, LogOut } from "lucide-react";
 
-import profileImg from "@/assets/profile-image.jpg";
-
 import PropTypes from "prop-types";
 
 export const Header = ({ collapsed, setCollapsed }) => {
@@ -27,7 +25,7 @@ export const Header = ({ collapsed, setCollapsed }) => {
                         type="text"
                         name="search"
                         id="search"
-                        placeholder="Search..."
+                        placeholder="Rechercher..."
                         className="w-full bg-transparent text-slate-900 outline-0 placeholder:text-slate-300 dark:text-slate-50"
                     />
                 </div>
