@@ -2,7 +2,7 @@
 
 Projet de SGBD (sytème de gestion de base de données) réalisé en groupe à l'ESP
 
-<!-- ![Mosaic Tailwind admin template preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1) -->
+ [CoverFile](https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB/blob/amina/screenshots/cover.png)
 
 
 ## Description
@@ -32,7 +32,7 @@ L'objectif de ce projet est de concevoir et développer une plateforme web perme
 
 ### Technologies utilisées
 
-<!-- ![Mosaic Tailwind admin template preview](https://github.com/cruip/tailwind-dashboard-template/assets/2683512/ef306423-3b89-4d0c-be80-9c5c682478d1) -->
+!template preview](https://github.com/yacinefalldiagne/Projet_SGBD_AutoEvalDB/blob/amina/screenshots/technologies.png)
 
 #### 1. Front End :
   React JS
