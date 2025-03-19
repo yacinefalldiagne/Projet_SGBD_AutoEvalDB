@@ -2,7 +2,7 @@
 
 Projet de SGBD (sytème de gestion de base de données) réalisé en groupe à l'ESP
 
- [CoverFile](screenshots/cover.png)
+ ![CoverFile](screenshots/cover.png)
 
 
 ## Description
