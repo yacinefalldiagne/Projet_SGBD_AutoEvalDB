@@ -12,7 +12,7 @@ export function OAuthCallback() {
         const fetchUser = async () => {
             try {
                 // Faire une requête pour récupérer les informations de l'utilisateur connecté
-                const { data } = await axios.get("http://localhost:8000/profile", {
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/profile`, {
                     withCredentials: true, // Inclure les cookies
                 });
 

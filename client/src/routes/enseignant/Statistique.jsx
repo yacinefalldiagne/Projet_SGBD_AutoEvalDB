@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { BookOpen, TrendingUp, Users, Award, GraduationCap, BookCheck, PencilLine, Trash, Clock } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/Dialog";
 import axios from 'axios';
 
 const Statistique = () => {
@@ -26,7 +26,7 @@ const Statistique = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_URL}`;
 
   // Gestion du mode sombre
   useEffect(() => {

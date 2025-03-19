@@ -12,7 +12,7 @@ const StudentAssignmentsPage = () => {
   const [error, setError] = useState(null);
 
   // URL de base du serveur
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = `${import.meta.env.VITE_API_URL}`;
 
   // Fonction pour récupérer les sujets depuis l'API
   const fetchAssignments = useCallback(async () => {

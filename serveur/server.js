@@ -19,14 +19,20 @@ mongoose
     .then(() => console.log("DB connected"))
     .catch((err) => console.log("DB not connected", err));
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
-app.use(
-    cors({
-        origin: process.env.CLIENT_URL || "http://localhost:3000",
-        credentials: true,
-    })
-);
+const allowedOrigins = ['http://localhost', 'http://localhost:3000'];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+}))
 
 // Middleware pour parser les JSON
 app.use(express.json());

@@ -25,7 +25,7 @@ const SettingsPage = () => {
         const fetchUserData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:8000/api/student/profile", {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/student/profile`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
                 setUserData({
@@ -49,7 +49,7 @@ const SettingsPage = () => {
         try {
             setLoading(true);
             const response = await axios.put(
-                "http://localhost:8000/api/student/profile",
+                `${import.meta.env.VITE_API_URL}/api/student/profile`,
                 {
                     name: userData.name,
                     email: userData.email,
@@ -81,7 +81,7 @@ const SettingsPage = () => {
         try {
             setLoading(true);
             await axios.put(
-                "http://localhost:8000/api/student/password",
+                `${import.meta.env.VITE_API_URL}/api/student/password`,
                 {
                     currentPassword: passwordData.currentPassword,
                     newPassword: passwordData.newPassword,

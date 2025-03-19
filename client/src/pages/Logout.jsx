@@ -10,7 +10,7 @@ const Logout = () => {
         const handleLogout = async () => {
             try {
                 // Supprimer le token côté backend
-                await axios.post("http://localhost:8000/logout", {}, { withCredentials: true });
+                await axios.post(`${import.meta.env.VITE_API_URL}/logout`, {}, { withCredentials: true });
 
                 // Supprimer le token du localStorage
                 localStorage.removeItem('userToken');
