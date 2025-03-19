@@ -9,12 +9,12 @@ const DevoirEtudiant = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [correctionMessages, setCorrectionMessages] = useState({});
-    const [selectedReponse, setSelectedReponse] = useState(null); // Pour le modal de détails
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal de détails
-    const [fileModalOpen, setFileModalOpen] = useState(false); // Modal pour consulter le fichier
-    const [fileUrl, setFileUrl] = useState(null); // URL du fichier à consulter
-    const [selectedReponses, setSelectedReponses] = useState([]); // État pour suivre les réponses sélectionnées
-    const [selectAll, setSelectAll] = useState(false); // État pour la case "Tout sélectionner"
+    const [selectedReponse, setSelectedReponse] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [fileModalOpen, setFileModalOpen] = useState(false);
+    const [fileUrl, setFileUrl] = useState(null);
+    const [selectedReponses, setSelectedReponses] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
 
     const BASE_URL = "http://localhost:8000";
 
@@ -72,7 +72,7 @@ const DevoirEtudiant = () => {
             for (const reponse of reponsesToCorrect) {
                 await handleGenerateCorrection(reponse._id);
             }
-            setSelectedReponses([]); // Réinitialiser la sélection après correction
+            setSelectedReponses([]);
             setSelectAll(false);
         } catch (error) {
             console.error("Erreur lors de la correction en masse :", error);
@@ -109,15 +109,29 @@ const DevoirEtudiant = () => {
         setSelectedReponse(null);
     };
 
-    const handleViewFile = (fileUrl) => {
-        setFileUrl(`${BASE_URL}${fileUrl}`); // Préfixer avec BASE_URL
-        setFileModalOpen(true);
+    const handleViewFile = async (reponseId) => {
+        try {
+            // Récupérer le fichier déchiffré depuis le nouvel endpoint
+            const response = await axios.get(`${BASE_URL}/downloadReponseFile/${reponseId}`, {
+                withCredentials: true,
+                responseType: 'blob', // Pour recevoir un fichier brut
+            });
+
+            // Créer une URL temporaire à partir du Blob
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            setFileUrl(url);
+            setFileModalOpen(true);
+        } catch (error) {
+            console.error("Erreur lors de la récupération du fichier :", error);
+            alert("Impossible de récupérer le fichier. Veuillez réessayer.");
+        }
     };
 
     const handleCloseFileModal = () => {
         setFileModalOpen(false);
         if (fileUrl) {
-            window.URL.revokeObjectURL(fileUrl); // Nettoyage si nécessaire
+            window.URL.revokeObjectURL(fileUrl);
             setFileUrl(null);
         }
     };
@@ -194,7 +208,7 @@ const DevoirEtudiant = () => {
                                                 type="checkbox"
                                                 checked={selectedReponses.includes(reponse._id)}
                                                 onChange={() => handleSelectReponse(reponse._id)}
-                                                disabled={reponse.correction} // Désactiver si déjà corrigé
+                                                disabled={reponse.correction}
                                             />
                                         </td>
                                         <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{index + 1}</td>
@@ -203,7 +217,7 @@ const DevoirEtudiant = () => {
                                         <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
                                             {reponse.fileUrl ? (
                                                 <button
-                                                    onClick={() => handleViewFile(reponse.fileUrl)}
+                                                    onClick={() => handleViewFile(reponse._id)}
                                                     className="text-blue-500 hover:underline"
                                                 >
                                                     Consulter
@@ -278,7 +292,7 @@ const DevoirEtudiant = () => {
                             <p>
                                 <strong>Fichier :</strong>
                                 <button
-                                    onClick={() => handleViewFile(selectedReponse.fileUrl)}
+                                    onClick={() => handleViewFile(selectedReponse._id)}
                                     className="text-blue-500 hover:underline"
                                 >
                                     Consulter
@@ -306,7 +320,7 @@ const DevoirEtudiant = () => {
                         />
                     </div>
                 ) : (
-                    <p className="text-gray-500 text-center">Aucun fichier à afficher.</p>
+                    <p className="text-gray-500 text-center">Chargement du fichier...</p>
                 )}
             </Modal>
         </div>

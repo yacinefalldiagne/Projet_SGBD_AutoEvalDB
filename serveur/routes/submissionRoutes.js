@@ -1,7 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-const { createReponse, getReponse, getAssignments, getReponsesByStudent, getAllCorrections, generateCorrectionForReponse, getCorrectionsForStudent, updateCorrectionScore, updateCorrectionFeedback, getCorrectionsByStudent, getDashboard } = require("../controllers/reponseController");
+const {
+    createReponse,
+    getReponse,
+    getAssignments,
+    getReponsesByStudent,
+    getAllCorrections,
+    generateCorrectionForReponse,
+    getCorrectionsForStudent,
+    updateCorrectionScore,
+    updateCorrectionFeedback,
+    getCorrectionsByStudent,
+    getDashboard,
+    downloadReponseFile
+} = require("../controllers/reponseController");
 
 // Middleware
 router.use(
@@ -22,5 +35,6 @@ router.get("/getCorrectionsForStudent", getCorrectionsForStudent);
 router.put('/corrections/:correctionId/score', updateCorrectionScore);
 router.put('/corrections/:correctionId/feedback', updateCorrectionFeedback);
 router.get("/dashboard", getDashboard);
+router.get("/downloadReponseFile/:reponseId", downloadReponseFile);
 
 module.exports = router;

@@ -93,7 +93,7 @@ const FileManager = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true, // Important pour envoyer les cookies d'authentification
+        withCredentials: true,
       });
 
       if (response.status === 201) {
@@ -194,26 +194,6 @@ const FileManager = () => {
             </div>
           </div>
 
-          {/* <div>
-            <Label htmlFor="model-upload" className="block text-lg font-semibold text-gray-700 mb-2">
-              Ajouter un modèle de correction :
-            </Label>
-            <div
-              className={`relative border-2 border-dashed rounded-lg p-6 transition-colors duration-300 ${correctionDropzone.isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-gray-50"}`}
-              {...correctionDropzone.getRootProps()}
-            >
-              <input {...correctionDropzone.getInputProps()} />
-              <div className="cursor-pointer flex flex-col items-center">
-                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                {corrections.length > 0 ? (
-                  <span className="text-gray-600 text-sm">Fichier sélectionné : {corrections[0].name}</span>
-                ) : (
-                  <span className="text-gray-600 text-sm">Glissez un fichier ici ou cliquez pour sélectionner (PDF, DOC, DOCX)</span>
-                )}
-              </div>
-            </div>
-          </div> */}
-
           <Button
             type="submit"
             className="mt-12 bg-blue-500 text-white hover:bg-blue-600"
@@ -223,67 +203,7 @@ const FileManager = () => {
           </Button>
         </form>
 
-        {/* Affichage des sujets */}
-        {/* <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Sujets :</h3>
-          {subjects.length === 0 ? (
-            <p className="text-gray-500 text-sm">Aucun sujet ajouté pour le moment.</p>
-          ) : (
-            <AnimatePresence>
-              {subjects.map((file, index) => (
-                <motion.div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-100 rounded-lg mt-2 shadow-sm hover:bg-gray-200 transition-colors"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <span className="text-gray-700 truncate max-w-xs">{file.name}</span>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleFileRemove(index, "subject")}
-                    aria-label={`Supprimer ${file.name}`}
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
-        </div> */}
 
-        {/* Affichage des modèles */}
-        {/* <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Modèles de correction :</h3>
-          {corrections.length === 0 ? (
-            <p className="text-gray-500 text-sm">Aucun modèle ajouté pour le moment.</p>
-          ) : (
-            <AnimatePresence>
-              {corrections.map((file, index) => (
-                <motion.div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-100 rounded-lg mt-2 shadow-sm hover:bg-gray-200 transition-colors"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <span className="text-gray-700 truncate max-w-xs">{file.name}</span>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleFileRemove(index, "model")}
-                    aria-label={`Supprimer ${file.name}`}
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </Button>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
-        </div> */}
       </div>
     </div>
   );
