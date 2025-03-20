@@ -103,6 +103,7 @@ $ npm install
  
  
    ![CoverFile](screenshots/view_correction.png)
+   
 
    ![CoverFile](screenshots/view_pdf.png)
     
@@ -116,7 +117,7 @@ $ npm install
 
 4.Dashboard Etudiant
 
-![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224907.png)
+![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224901.png)
 
 
 
