@@ -13,16 +13,17 @@ services:
       - backend
 
   backend:
-  build:
-    context: ./serveur
-    dockerfile: Dockerfile
-  ports:
-    - "8000:8000"
-  env_file:
-    - ./serveur/.env
-  depends_on:
-    - minio
-    - ollama
+    build:
+      context: ./serveur
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./serveur/.env
+    depends_on:
+      - minio
+      - ollama
+
   minio:
     image: minio/minio:latest
     ports:

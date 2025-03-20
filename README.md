@@ -82,15 +82,89 @@ $ npm install
 
    ![CoverFile](screenshots/accueil.png)
 
+   ![CoverFile](screenshots/accueil.png)
+
 <!-- ![homepg](https://github.com/Ousmane-java/projetSGBD/blob/main/snapshots/accueil.png) -->
 
 2. Login page
 
    ![CoverFile](screenshots/login.png)
 
+   ![CoverFile](screenshots/login.png)
+
 <!-- ![loginpg](https://github.com/Ousmane-java/projetSGBD/blob/main/snapshots/page-connexion.png) -->
 
 3. Register
+
+![CoverFile](screenshots/register.png)
+
+4.Dashboard Enseignant
+
+![CoverFile](screenshots/add_file.png)
+
+4.1. Liste des Devoir
+
+![CoverFile](screenshots/listeDevoirEnseignant.jpg)
+
+
+4.2. Modele de Correction
+
+![CoverFile](screenshots/correctionEnseignant.jpg)
+
+
+![CoverFile](screenshots/view_pdf.png)
+
+
+![CoverFile](screenshots/ajusterNoteEnseignant.jpg)
+
+
+![CoverFile](screenshots/ModelcorrectionEnseignant.jpg)
+
+
+
+4.3.Gestion des notes
+
+![CoverFile](screenshots/GestionNote.jpg)
+
+
+4.4.Apprentissage
+
+4.5.Statistique
+
+![CoverFile](screenshots/Statistique.png)
+
+4.6. Ajuster Note 
+
+![CoverFile](screenshots/ajusterNoteEnseignant.jpg)
+
+
+
+5.Dashboard Etudiant
+
+![CoverFile](screenshots/etudiantDash.jpg)
+
+![CoverFile](screenshots/Eudiant.png)
+
+5.1.Soumettre Reponse
+
+![CoverFile](screenshots/soumissionReponse.jpg)
+
+5.2. Feedback Ia
+
+![CoverFile](screenshots/FeedbackIA.jpg)
+
+5.3 Consulter correction 
+
+![CoverFile](screenshots/consultercorrectionEtudiant.jpg)
+
+
+
+
+
+
+
+3.Register
+
 
 ![CoverFile](screenshots/register.png)
 
