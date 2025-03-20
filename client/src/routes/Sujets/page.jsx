@@ -17,7 +17,7 @@ const StudentAssignmentsPage = () => {
   // Fonction pour récupérer les sujets depuis l'API
   const fetchAssignments = useCallback(async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/getTopic`);
+      const response = await axios.get(`${BASE_URL}/getTopic`, , { withCredentials: true });
       setAssignments(response.data);
       setLoading(false);
     } catch (err) {
