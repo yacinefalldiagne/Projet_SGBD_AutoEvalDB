@@ -81,3 +81,12 @@ $ npm install
 
 <!-- ![loginpg](https://github.com/Ousmane-java/projetSGBD/blob/main/snapshots/page-connexion.png) -->
 
+3.Dashboard Enseignant
+
+ ![CoverFile](screenshots/add_file.png)
+
+ 
+
+
+
+
