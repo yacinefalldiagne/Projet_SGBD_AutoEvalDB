@@ -79,16 +79,16 @@ $ npm install
 ## Snapshots
 
 1. Accueil
-   
-    ![CoverFile](screenshots/accueil.png)
+
+   ![CoverFile](screenshots/accueil.png)
 
    ![CoverFile](screenshots/accueil.png)
 
 <!-- ![homepg](https://github.com/Ousmane-java/projetSGBD/blob/main/snapshots/accueil.png) -->
 
 2. Login page
-   
-    ![CoverFile](screenshots/login.png)
+
+   ![CoverFile](screenshots/login.png)
 
    ![CoverFile](screenshots/login.png)
 
@@ -165,46 +165,74 @@ $ npm install
 
 3.Register
 
-   ![CoverFile](screenshots/register.png)
-    
+
+![CoverFile](screenshots/register.png)
 
 4.Dashboard Enseignant
 
+![CoverFile](screenshots/add_file.png)
 
-   ![CoverFile](screenshots/add_file.png)
-   
+4.1. Liste des Devoir
 
- 4.1. Liste des Devoir
- 
- 
- 4.2. Modele de Correction
- 
- 
-   ![CoverFile](screenshots/view_correction.png)
-   
+![CoverFile](screenshots/listeDevoirEnseignant.jpg)
 
-   ![CoverFile](screenshots/view_pdf.png)
-    
- 4.3. Gestion des notes 
- 
- 4.4. Apprentissage
- 
- 4.5. Statistique 
- 
-![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224801.png)
 
-4.Dashboard Etudiant
+4.2. Modele de Correction
 
-![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224901.png)
+![CoverFile](screenshots/correctionEnseignant.jpg)
+
+
+![CoverFile](screenshots/view_pdf.png)
+
+
+![CoverFile](screenshots/ajusterNoteEnseignant.jpg)
+
+
+![CoverFile](screenshots/ModelcorrectionEnseignant.jpg)
 
 
 
+4.3.Gestion des notes
 
- 
- 
- 
+![CoverFile](screenshots/GestionNote.jpg)
 
- 
+
+4.4.Apprentissage
+
+4.5.Statistique
+
+![CoverFile](screenshots/Statistique.png)
+
+4.6. Ajuster Note 
+
+![CoverFile](screenshots/ajusterNoteEnseignant.jpg)
+
+
+
+5.Dashboard Etudiant
+
+![CoverFile](screenshots/etudiantDash.jpg)
+
+![CoverFile](screenshots/Eudiant.png)
+
+5.1.Soumettre Reponse
+
+![CoverFile](screenshots/soumissionReponse.jpg)
+
+5.2. Feedback Ia
+
+![CoverFile](screenshots/FeedbackIA.jpg)
+
+5.3 Consulter correction 
+
+![CoverFile](screenshots/consultercorrectionEtudiant.jpg)
+
+
+
+
+
+
+
 
 
 
