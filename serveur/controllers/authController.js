@@ -76,7 +76,12 @@ const loginUser = async (req, res) => {
             if (err) {
                 return res.status(400).json({ error: 'Error creating token' });
             }
-            res.cookie('token', token, { httpOnly: true, secure: false, maxAge: 3600000 });
+            res.cookie('token', token, { 
+                httpOnly: true, 
+                secure: process.env.NODE_ENV === "production", // Secure in production
+                sameSite: 'None', // Required for cross-origin
+                maxAge: 3600000 
+            });
             res.json({ message: "Connexion réussie", token, user });
         });
     } catch (error) {
@@ -106,7 +111,7 @@ const getProfile = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
-    res.clearCookie('token', { httpOnly: true, secure: false });
+    res.clearCookie('token', { httpOnly: true, secure: true });
     res.json({ message: "Déconnexion réussie" });
 };
 
