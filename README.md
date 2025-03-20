@@ -86,27 +86,36 @@ $ npm install
 <!-- ![loginpg](https://github.com/Ousmane-java/projetSGBD/blob/main/snapshots/page-connexion.png) -->
 
 3.Register
+
     ![CoverFile](screenshots/register.png)
+    
 
 4.Dashboard Enseignant
 
+
    ![CoverFile](screenshots/add_file.png)
+   
 
  4.1. Liste des Devoir
  
+ 
  4.2. Modele de Correction
+ 
  
    ![CoverFile](screenshots/view_correction.png)
 
    ![CoverFile](screenshots/view_pdf.png)
     
  4.3. Gestion des notes 
+ 
  4.4. Apprentissage
+ 
  4.5. Statistique 
  
 ![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224801.png)
 
 4.Dashboard Etudiant
+
 ![CoverFile](screenshots/Capture_d_ecran_2025-03-18_224907.png)
 
 
