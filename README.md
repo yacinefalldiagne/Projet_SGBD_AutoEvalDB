@@ -87,7 +87,7 @@ $ npm install
 
 3.Register
 
-    ![CoverFile](screenshots/register.png)
+   ![CoverFile](screenshots/register.png)
     
 
 4.Dashboard Enseignant
